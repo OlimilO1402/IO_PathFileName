@@ -363,7 +363,7 @@ Try:     On Error GoTo Catch
                 'ein Dokument
                 Dim hwnd As Long
                 'Debug.Print m_PFN
-                ret = ShellExecute(hwnd, "Open", Me.Quoted, Cmd, Me.Path, WindowStyle)
+                ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
             End If
         End If
         Start = ret

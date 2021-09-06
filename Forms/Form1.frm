@@ -1,12 +1,13 @@
 VERSION 5.00
 Begin VB.Form Form1 
    Caption         =   "Testing class PathFileName"
-   ClientHeight    =   10335
+   ClientHeight    =   9840
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   9975
+   Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   10335
+   ScaleHeight     =   9840
    ScaleWidth      =   9975
    StartUpPosition =   3  'Windows-Standard
    Begin VB.CommandButton BtnTestExists 
