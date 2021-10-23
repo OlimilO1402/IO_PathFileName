@@ -33,11 +33,6 @@ Attribute VB_Exposed = False
 '  C:\Windows\System32\          |  user32.dll
 
 Option Explicit 'OM 06.11.2015 13:45; Zeilen: 336
-#If VBA7 = 0 Then
-    'Public Enum LongPtr
-    '    [_]
-    'End Enum
-#End If
 #If VBA7 Then
     Private Declare PtrSafe Function ShellExecuteW Lib "shell32" ( _
         ByVal hwnd As LongPtr, _
@@ -49,6 +44,10 @@ Option Explicit 'OM 06.11.2015 13:45; Zeilen: 336
     'creates a complete directory of arbitrary depth:
     Private Declare PtrSafe Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
 #Else
+    'activate the Enum LongPtr if you do not want to declare it in a module
+    'Public Enum LongPtr
+    '    [_]
+    'End Enum
     Private Declare Function ShellExecuteW Lib "shell32" ( _
         ByVal hwnd As LongPtr, _
         ByVal lpOperation As LongPtr, _
@@ -59,32 +58,72 @@ Option Explicit 'OM 06.11.2015 13:45; Zeilen: 336
     'erzeugt eine komplette Verzeichnisstruktur beliebiger Tiefe:
     Private Declare Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
 #End If
-'Public Enum FileAccess
-Public Enum FileMode
-    fmBinary_Read
-    fmBinary_Write
-    fmBinary_ReadWrite
-    fmText_Read
-    fmText_Write
-End Enum
-Private m_PFN As String
-Private Const InvalidChars As String = "\/:*?""<>|" 'bei Dateiname noch "/\:"
-Private Const C_DirSepChar As Long = 92 ' String = "\" ' = Chr(92)
-Private Const C_ExtSepChar As Long = 46 ' String = "." ' = Chr(46)
-Private Const C_InvalidChars As String = "*?""<>|" 'bei Dateiname noch "/\:"
-Private Const C_3Pt As String = "..."
 
+
+'old
+'Public Enum FileMode
+'    fmBinary_Read
+'    fmBinary_Write
+'    fmBinary_ReadWrite
+'    fmText_Read
+'    fmText_Write
+'End Enum
+Public Enum FileMode
+    FileMode_Append
+    FileMode_Binary
+    FileMode_Input
+    FileMode_Output
+    FileMode_Random
+End Enum
+Public Enum FileAccess
+    FileAccess_None
+    FileAccess_Read = 1
+    FileAccess_Write = 2
+    FileAccess_ReadWrite = 3 'Read Or Write is default
+End Enum
+'Public Enum FileShare
+'   FileShare_None = 0
+'   FileShare_Read = 1
+'   FileShare_Write = 2
+'   FileShare_ReadWrite = 3
+'   FileShare_Inheritable = 16
+'End Enum
+Public Enum FileShare
+    FileShare_None = 0
+    FileShare_LockRead = 1
+    FileShare_LockWrite = 2
+    FileShare_LockReadWrite = 3
+    FileShare_Shared = 16
+End Enum
+Private Enum ReadKind
+    ReadInput      'Read one thing
+    ReadLineInput  'Read one line
+    ReadInputFkt   'Read the whole stuff to the end
+End Enum
+'Oh Shit, 5 * 3 * 4 = 60 verschiedene Möglichkeiten 'oder manche sind siher nicht möglich
+Private Const InvalidChars   As String = "\/:*?""<>|" 'bei Dateiname noch "/\:"
+Private Const C_DirSepChar   As Long = 92 ' String = "\" ' = Chr(92)
+Private Const C_ExtSepChar   As Long = 46 ' String = "." ' = Chr(46)
+Private Const C_InvalidChars As String = "*?""<>|" 'bei Dateiname noch "/\:"
+Private Const C_3Pt          As String = "..."
+
+Private m_PFN     As String 'the Value
 Private m_IsValid As Boolean
 
-Private m_FNr As Integer
-Private m_fm  As FileMode
+Private m_FNr     As Integer
+'Private m_fm     As FileMode
+Private m_FMode   As FileMode
+Private m_FAccess As FileAccess
+Private m_FShare  As FileShare
 
 ' v ############################## v '    Constructors      ' v ############################## v '
 Private Sub Class_Initialize()
+    m_FAccess = FileAccess.FileAccess_ReadWrite
 End Sub
 Private Sub Class_Terminate()
     Me.CloseFile
 End Sub
+'Friend Sub New_(aPath As String, Optional FMode As FileMode = FileMode_Random, Optional FAccess As FileAccess = FileAccess_ReadWrite, Optional FShare As FileShare = FileShare_None)
 Friend Sub New_(ByVal aPathOrPFN As String, _
        Optional ByVal aFileName As String, _
        Optional ByVal aExt As String)
@@ -253,8 +292,8 @@ End Property
 ' ^ ############################## ^ '  Public Properties   ' ^ ############################## ^ '
 
 ' v ####################### v ' Public ReadOnly Boolean Properties ' v ####################### v '
-Public Property Get IsIdent(other As Object) As Boolean
-    IsIdent = ObjPtr(Me) = ObjPtr(other)
+Public Property Get IsSame(other As Object) As Boolean
+    IsSame = ObjPtr(Me) = ObjPtr(other)
 End Property
 Public Property Get IsEqual(other As PathFileName) As Boolean
     IsEqual = Me.Value = other.Value
@@ -702,6 +741,11 @@ CatchE:
     ErrHandler "Rename", ToPFN
 End Function
 
+Public Property Get Length() As Long
+    'Returns the length or size of the file in bytes
+    If m_FNr Then Length = LOF(m_FNr) Else Length = FileLen(m_PFN)
+End Property
+
 'Functions for Writing to and Reading from files
 Public Function OpenFile(fm As FileMode) As Integer
     m_fm = fm
@@ -735,6 +779,218 @@ Try: On Error GoTo Catch
 Catch:
     ErrHandler "OpenFile", m_PFN
 End Function
+
+'Friend Sub New_(aPath As String, Optional FMode As FileMode = FileMode_Random, Optional FAccess As FileAccess = FileAccess_ReadWrite, Optional FShare As FileShare = FileShare_None)
+'Private Function OOpen(ByVal aFMode As FileMode, ByVal aFAccess As FileAccess, ByVal aFShare As FileShare) As Boolean
+Private Function OpenFile(Optional ByVal fm As FileMode = FileMode.FileMode_Random, _
+                          Optional ByVal fa As FileAccess = FileAccess.FileAccess_ReadWrite, _
+                          Optional ByVal fs As FileShare = FileShare.FileShare_None) As Integer
+Try: On Error GoTo Catch
+    'aFMode = mFMode
+    'aFAccess = mFAccess
+    'aFShare = mFShare
+    If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
+    m_FNr = FreeFile
+    Select Case fm
+    Case FileMode.FileMode_Append
+        Select Case fa
+        Case FileAccess.FileAccess_None
+            Select Case fs
+            Case FileShare_None:          Open mPath For Append As m_FNr
+            Case FileShare_LockRead:      Open mPath For Append Lock Read As m_FNr
+            Case FileShare_LockWrite:     Open mPath For Append Lock Write As m_FNr
+            Case FileShare_LockReadWrite: Open mPath For Append Lock Read Write As m_FNr
+            Case FileShare_Shared:        Open mPath For Append Shared As m_FNr
+            End Select
+        'Case FileAccess.FileAccess_Read 'Not Possible
+        '    Select Case aFShare
+        '    Case FileShare_None:          Open mPath For Append Access Read As m_FNr
+        '    Case FileShare_LockRead:      Open mPath For Append Access Read Lock Read As m_FNr
+        '    Case FileShare_LockWrite:     Open mPath For Append Access Read Lock Write As m_FNr
+        '    Case FileShare_LockReadWrite: Open mPath For Append Access Read Lock Read Write As m_FNr
+        '    Case FileShare_Shared:        Open mPath For Append Access Read Shared As m_FNr
+        '    End Select
+        Case FileAccess.FileAccess_Write
+            Select Case fs
+            Case FileShare_None:          Open mPath For Append Access Write As m_FNr
+            Case FileShare_LockRead:      Open mPath For Append Access Write Lock Read As m_FNr
+            Case FileShare_LockWrite:     Open mPath For Append Access Write Lock Write As m_FNr
+            Case FileShare_LockReadWrite: Open mPath For Append Access Write Lock Read Write As m_FNr
+            Case FileShare_Shared:        Open mPath For Append Access Write Shared As m_FNr
+            End Select
+        Case FileAccess.FileAccess_ReadWrite
+            Select Case fs
+            Case FileShare_None:          Open mPath For Append Access Read Write As m_FNr
+            Case FileShare_LockRead:      Open mPath For Append Access Read Write Lock Read As m_FNr
+            Case FileShare_LockWrite:     Open mPath For Append Access Read Write Lock Write As m_FNr
+            Case FileShare_LockReadWrite: Open mPath For Append Access Read Write Lock Read Write As m_FNr
+            Case FileShare_Shared:        Open mPath For Append Access Read Write Shared As m_FNr
+            End Select
+        End Select
+    Case FileMode.FileMode_Binary
+      Select Case fa
+      Case FileAccess.FileAccess_None
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Binary As #mFNr
+        Case FileShare_LockRead:      Open mPath For Binary Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Binary Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Binary Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Binary Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_Read
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Binary Access Read As #mFNr
+        Case FileShare_LockRead:      Open mPath For Binary Access Read Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Binary Access Read Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Binary Access Read Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Binary Access Read Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_Write
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Binary Access Write As #mFNr
+        Case FileShare_LockRead:      Open mPath For Binary Access Write Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Binary Access Write Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Binary Access Write Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Binary Access Write Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_ReadWrite
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Binary Access Read Write As #mFNr
+        Case FileShare_LockRead:      Open mPath For Binary Access Read Write Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Binary Access Read Write Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Binary Access Read Write Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Binary Access Read Write Shared As #mFNr
+        End Select
+      End Select
+    Case FileMode.FileMode_Input
+      Select Case aFAccess
+      Case FileAccess.FileAccess_None
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Input As #mFNr
+        Case FileShare_LockRead:      Open mPath For Input Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Input Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Input Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Input Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_Read
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Input Access Read As #mFNr
+        Case FileShare_LockRead:      Open mPath For Input Access Read Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Input Access Read Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Input Access Read Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Input Access Read Shared As #mFNr
+        End Select
+    '    Case FileAccess_Write 'Not Possible
+    '      Select Case aFShare
+    '      Case FileShare_None:          Open mPath For Input Access Write As #mFNr
+    '      Case FileShare_LockRead:      Open mPath For Input Access Write Lock Read As #mFNr
+    '      Case FileShare_LockWrite:     Open mPath For Input Access Write Lock Write As #mFNr
+    '      Case FileShare_LockReadWrite: Open mPath For Input Access Write Lock Read Write As #mFNr
+    '      Case FileShare_Shared:        Open mPath For Input Access Write Shared As #mFNr
+    '      End Select
+    '    Case FileAccess_ReadWrite 'Not Possible
+    '      Select Case aFShare
+    '      Case FileShare_None:          Open mPath For Input Access Read Write As #mFNr
+    '      Case FileShare_LockRead:      Open mPath For Input Access Read Write Lock Read As #mFNr
+    '      Case FileShare_LockWrite:     Open mPath For Input Access Read Write Lock Write As #mFNr
+    '      Case FileShare_LockReadWrite: Open mPath For Input Access Read Write Lock Read Write As #mFNr
+    '      Case FileShare_Shared:        Open mPath For Input Access Read Write Shared As #mFNr
+    '      End Select
+      End Select
+    Case FileMode.FileMode_Output
+      Select Case aFAccess
+      Case FileAccess.FileAccess_None
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Output As #mFNr
+        Case FileShare_LockRead:      Open mPath For Output Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Output Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Output Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Output Shared As #mFNr
+        End Select
+    '    Case FileAccess_Read
+    '      Select Case aFShare 'Not Possible
+    '      Case FileShare_None:          Open mPath For Output Access Read As #mFNr
+    '      Case FileShare_LockRead:      Open mPath For Output Access Read Lock Read As #mFNr
+    '      Case FileShare_LockWrite:     Open mPath For Output Access Read Lock Write As #mFNr
+    '      Case FileShare_LockReadWrite: Open mPath For Output Access Read Lock Read Write As #mFNr
+    '      Case FileShare_Shared:        Open mPath For Output Access Read Shared As #mFNr
+    '      End Select
+      Case FileAccess.FileAccess_Write
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Output Access Write As #mFNr
+        Case FileShare_LockRead:      Open mPath For Output Access Write Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Output Access Write Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Output Access Write Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Output Access Write Shared As #mFNr
+        End Select
+    '    Case FileAccess_ReadWrite
+    '      Select Case aFShare 'Not Possible
+    '      Case FileShare_None:          Open mPath For Output Access Read Write As #mFNr
+    '      Case FileShare_LockRead:      Open mPath For Output Access Read Write Lock Read As #mFNr
+    '      Case FileShare_LockWrite:     Open mPath For Output Access Read Write Lock Write As #mFNr
+    '      Case FileShare_LockReadWrite: Open mPath For Output Access Read Write Lock Read Write As #mFNr
+    '      Case FileShare_Shared:        Open mPath For Output Access Read Write Shared As #mFNr
+    '      End Select
+      End Select
+    Case FileMode.FileMode_Random
+      Select Case aFAccess
+      Case FileAccess.FileAccess_None
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Random As #mFNr
+        Case FileShare_LockRead:      Open mPath For Random Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Random Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Random Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Random Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_Read
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Random Access Read As #mFNr
+        Case FileShare_LockRead:      Open mPath For Random Access Read Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Random Access Read Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Random Access Read Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Random Access Read Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_Write
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Random Access Write As #mFNr
+        Case FileShare_LockRead:      Open mPath For Random Access Write Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Random Access Write Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Random Access Write Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Random Access Write Shared As #mFNr
+        End Select
+      Case FileAccess.FileAccess_ReadWrite
+        Select Case aFShare
+        Case FileShare_None:          Open mPath For Random Access Read As #mFNr
+        Case FileShare_LockRead:      Open mPath For Random Access Read Write Lock Read As #mFNr
+        Case FileShare_LockWrite:     Open mPath For Random Access Read Write Lock Write As #mFNr
+        Case FileShare_LockReadWrite: Open mPath For Random Access Read Write Lock Read Write As #mFNr
+        Case FileShare_Shared:        Open mPath For Random Access Read Write Shared As #mFNr
+        End Select
+      End Select
+    End Select
+    OpenFile = m_FNr
+    Exit Function
+Catch:
+    MsgBox "Error: " & CStr(Err.Number) & " in PFNStream::OOpen: " & Err.Description
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Public Sub WriteStr(aStr As String)
 Try: On Error GoTo Catch
