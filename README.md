@@ -1,5 +1,5 @@
 # IO_PathFileName
-## one class for every function on path, filename and file you can imagine    
+## one class for every function you can imagine on path, filename and files    
 
 [![GitHub](https://img.shields.io/github/license/OlimilO1402/IO_PathFileName?style=plastic)](https://github.com/OlimilO1402/IO_PathFileName/blob/master/LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/OlimilO1402/IO_PathFileName?style=plastic)](https://github.com/OlimilO1402/IO_PathFileName/releases/latest)
