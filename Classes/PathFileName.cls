@@ -44,7 +44,7 @@ Option Explicit 'OM 06.11.2015 13:45; Zeilen: 336
     'creates a complete directory of arbitrary depth:
     Private Declare PtrSafe Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
 #Else
-    'activate the Enum LongPtr if you do not want to declare it in a module
+    'activate the Enum LongPtr if you do not want to declare it in another module, maybe because this is the only class you use
     'Public Enum LongPtr
     '    [_]
     'End Enum
@@ -101,7 +101,7 @@ Private Enum ReadKind
     ReadInputFkt   'Read the whole stuff to the end
 End Enum
 'Oh Shit, 5 * 3 * 4 = 60 verschiedene Möglichkeiten 'oder manche sind siher nicht möglich
-Private Const InvalidChars   As String = "\/:*?""<>|" 'bei Dateiname noch "/\:"
+Private Const InvalidChars   As String = "\/:*?""<>|" 'bei Dateiname noch "/\:" 'im Pfad darf vorne und hinten kein Leerzeichen sein
 Private Const C_DirSepChar   As Long = 92 ' String = "\" ' = Chr(92)
 Private Const C_ExtSepChar   As Long = 46 ' String = "." ' = Chr(46)
 Private Const C_InvalidChars As String = "*?""<>|" 'bei Dateiname noch "/\:"
@@ -159,14 +159,14 @@ Friend Sub NewC(other As PathFileName) 'Copy-ctor
     m_PFN = other.Value
 End Sub
 Friend Function Clone() As PathFileName
-    Set Clone = New PathFileName: Clone.Value = m_PFN
+    Set Clone = New PathFileName: Clone.NewC Me 'Value = m_PFN
 End Function
 
 'internal ctor
-Private Function New_PFN(ByVal aPathFileName As String, _
+Private Function New_PathFileName(ByVal aPathFileName As String, _
                 Optional ByVal aFileName As String, _
                 Optional ByVal aExt As String) As PathFileName
-    Set New_PFN = New PathFileName: New_PFN.New_ aPathFileName, aFileName, aExt
+    Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
 
 ' ^ ############################## ^ '    Constructors      ' ^ ############################## ^ '
@@ -322,116 +322,116 @@ End Property
 
 ' v ############################## v '   Public Functions   ' v ############################## v '
 
-#If VBA7 Then
-    Public Function Start(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
+'#If VBA7 Then
+Public Function Start(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
 Try:     On Error GoTo Catch
-        'startet ohne zu warten = asynchron
-        Dim ret As Long
-        If Me.FileName = "" Then
-            Dim p As PathFileName: Set p = Me
-            Do While Not p Is Nothing
-                If p.PathExists Then Exit Do
-                'If Not p.PathExists Then
-                Set p = p.PathUp
-            Loop
-            If Not p Is Nothing Then
-                ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
-            End If
-            Exit Function
-        Else
-            Dim e As String: e = UCase(Me.Extension)
-            If e = "EXE" Or e = "BAT" Then
-                'ein ausführbares programm
-                Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-                ret = Shell(Cmd, WindowStyle) ' liefert die TaskID
-            Else
-                'ein Dokument
-                Dim hwnd As LongPtr
-                'Debug.Print m_PFN
-                ret = ShellExecute(hwnd, "Open", Me.Quoted, Cmd, Me.Path, WindowStyle)
-            End If
+    'startet ohne zu warten = asynchron
+    Dim ret As Long
+    If Me.FileName = "" Then
+        Dim p As PathFileName: Set p = Me
+        Do While Not p Is Nothing
+            If p.PathExists Then Exit Do
+            'If Not p.PathExists Then
+            Set p = p.PathUp
+        Loop
+        If Not p Is Nothing Then
+            ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
         End If
-        Start = ret
         Exit Function
-Catch:
-        ErrHandler "Start"
-    End Function
-    
-    Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String) As Long
-Try:     On Error GoTo Catch
-        'startet und wartet = synchron
-        'geht jetzt nur bei exe (oder bat?)
+    Else
         Dim e As String: e = UCase(Me.Extension)
-        If Not (e = "EXE" Or e = "BAT") Then
-            MsgBox "Nur ausführbare Programme (exe) können gestartet werden, Dateiendung: " & Me.Extension
-            Exit Function
-        End If
-        Dim ret As LongPtr
-        Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-        ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
-        'StartWait = ret
-        Exit Function
-Catch:
-        ErrHandler "StartWait"
-    End Function
-    
-#Else 'VBA6, VBC
-
-    Public Function Start(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
-Try:     On Error GoTo Catch
-        'startet ohne zu warten = asynchron
-        Dim ret As Long
-        If Me.FileName = "" Then
-            Dim p As PathFileName: Set p = Me
-            Do While Not p Is Nothing
-                If p.PathExists Then Exit Do
-                'If Not p.PathExists Then
-                Set p = p.PathUp
-            Loop
-            If Not p Is Nothing Then
-                ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
-            End If
-            Exit Function
+        If e = "EXE" Or e = "BAT" Then
+            'ein ausführbares programm
+            Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
+            ret = Shell(Cmd, WindowStyle) ' liefert die TaskID
         Else
-            Dim e As String: e = UCase(Me.Extension)
-            If e = "EXE" Or e = "BAT" Then
-                'ein ausführbares programm
-                Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-                ret = Shell(Cmd, WindowStyle) ' liefert die TaskID
-            Else
-                'ein Dokument
-                Dim hwnd As Long
-                'Debug.Print m_PFN
-                ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
-            End If
+            'ein Dokument
+            Dim hwnd As LongPtr
+            'Debug.Print m_PFN
+            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
         End If
-        Start = ret
-        Exit Function
+    End If
+    Start = ret
+    Exit Function
 Catch:
-        ErrHandler "Start"
-    End Function
+    ErrHandler "Start"
+End Function
     
-    Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String) As Long
+Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String) As Long
 Try:     On Error GoTo Catch
-        'startet und wartet = synchron
-        'geht jetzt nur bei exe (oder bat?)
-        Dim e As String: e = UCase(Me.Extension)
-        If Not (e = ".EXE" Or e = ".BAT" Or e = ".COM") Then
-            MsgBox "Start executable programs only (like .exe, .bat or .com), your file extension: " & Me.Extension
-            Exit Function
-        End If
-        Dim ret As Long
-        Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-        ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
-        'StartWait = ret
+    'startet und wartet = synchron
+    'geht jetzt nur bei exe (oder bat?)
+    Dim e As String: e = UCase(Me.Extension)
+    If Not (e = "EXE" Or e = "BAT") Then
+        MsgBox "Nur ausführbare Programme (exe) können gestartet werden, Dateiendung: " & Me.Extension
         Exit Function
+    End If
+    Dim ret As LongPtr
+    Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
+    ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
+    'StartWait = ret
+    Exit Function
 Catch:
-        ErrHandler "StartWait"
-    End Function
+    ErrHandler "StartWait"
+End Function
+    
+'#Else 'VBA6, VBC
+'
+'    Public Function Start(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
+'Try:     On Error GoTo Catch
+'        'startet ohne zu warten = asynchron
+'        Dim ret As Long
+'        If Me.FileName = "" Then
+'            Dim p As PathFileName: Set p = Me
+'            Do While Not p Is Nothing
+'                If p.PathExists Then Exit Do
+'                'If Not p.PathExists Then
+'                Set p = p.PathUp
+'            Loop
+'            If Not p Is Nothing Then
+'                ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
+'            End If
+'            Exit Function
+'        Else
+'            Dim e As String: e = UCase(Me.Extension)
+'            If e = "EXE" Or e = "BAT" Then
+'                'ein ausführbares programm
+'                Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
+'                ret = Shell(Cmd, WindowStyle) ' liefert die TaskID
+'            Else
+'                'ein Dokument
+'                Dim hwnd As Long
+'                'Debug.Print m_PFN
+'                ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
+'            End If
+'        End If
+'        Start = ret
+'        Exit Function
+'Catch:
+'        ErrHandler "Start"
+'    End Function
+'
+'    Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String) As Long
+'Try:     On Error GoTo Catch
+'        'startet und wartet = synchron
+'        'geht jetzt nur bei exe (oder bat?)
+'        Dim e As String: e = UCase(Me.Extension)
+'        If Not (e = ".EXE" Or e = ".BAT" Or e = ".COM") Then
+'            MsgBox "Start executable programs only (like .exe, .bat or .com), your file extension: " & Me.Extension
+'            Exit Function
+'        End If
+'        Dim ret As Long
+'        Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
+'        ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
+'        'StartWait = ret
+'        Exit Function
+'Catch:
+'        ErrHandler "StartWait"
+'    End Function
+'
+'#End If
 
-#End If
-
-Public Function RemoveQuotes(Optional ByVal aStrPFN As String) As String
+Public Function RemoveQuotes(ByVal aStrPFN As String) As String
     Dim q1 As Long: q1 = IIf(Asc(Left$(aStrPFN, 1)) = 34, 2, 1)
     Dim q2 As Long: q2 = IIf(Asc(Right$(aStrPFN, 1)) = 34, Len(aStrPFN) - 1, Len(aStrPFN))
     RemoveQuotes = Mid$(aStrPFN, q1, q2 - q1 + 1)
@@ -493,7 +493,7 @@ TryE: On Error GoTo CatchE
     'ein neues Verzeichnis mit Unterverzeichnissen anlegen
     If Len(sNewDir) = 0 Then sNewDir = Me.Path
     Call MakeValid(sNewDir)
-    Dim NewDir As PathFileName: Set NewDir = New_PFN(sNewDir)
+    Dim NewDir As PathFileName: Set NewDir = New_PathFileName(sNewDir)
     'zuerst in das jeweilige Laufwerk wechseln
     Dim sd As String: sd = NewDir.Drive()
     Call ChDir(sd)
@@ -548,7 +548,7 @@ Public Function PathUp() As PathFileName
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
     Dim pos As Long: pos = InStrRev(p, "\")
     If pos > 0 Then
-        Set PathUp = New_PFN(Left(p, pos))
+        Set PathUp = New_PathFileName(Left(p, pos))
     End If
 End Function
 
@@ -576,11 +576,11 @@ Public Function ChangeExt(newExtension As String) As PathFileName
 End Function
 Public Function AddToFileNameR(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameR = New_PFN(Me.Path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameR = New_PathFileName(Me.Path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
 End Function
 Public Function AddToFileNameL(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameL = New_PFN(Me.Path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameL = New_PathFileName(Me.Path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
 End Function
 
 Public Function Exists() As Boolean
@@ -593,7 +593,7 @@ Public Function Exists() As Boolean
         Exists = Not CBool(GetAttr(m_PFN) And (vbDirectory Or vbVolume))
     Else
         Dim p As String: p = Me.Path
-        Exists = Exists = CBool(GetAttr(p) And vbDirectory)
+        Exists = CBool(GetAttr(p) And vbDirectory)
     End If
     On Error GoTo 0
 End Function
@@ -607,6 +607,7 @@ Public Function PathExists() As Boolean
     'Laufzeitfehler 76 Pfad nicht gefunden
     'Runtime-Error  76 Path not found
     'just go ahead
+    PathExists = CBool(GetAttr(p) And vbDirectory)
     If Not IsInIDE Then
         PathExists = CBool(GetAttr(p) And vbDirectory)
     End If
@@ -652,7 +653,7 @@ Public Function CopyTo(newPathFileName As PathFileName, Optional bOverwrite As B
 Try: On Error GoTo Catch
     Dim newPFN As PathFileName
     If newPathFileName.IsPath Then
-        Set newPFN = New_PFN(newPathFileName.Path & Me.FileName)
+        Set newPFN = New_PathFileName(newPathFileName.Path & Me.FileName)
     Else
         Set newPFN = newPathFileName
     End If
@@ -724,7 +725,7 @@ End Function
 Public Function Rename(ByVal ToPFN As String, _
                        Optional ByVal BolRenameMe As Boolean) As Boolean
 TryE: On Error GoTo CatchE
-    Dim RenFile As PathFileName: Set RenFile = New_PFN(ToPFN)
+    Dim RenFile As PathFileName: Set RenFile = New_PathFileName(ToPFN)
     Dim Cmd     As String
     If Not RenFile.Exists Then
         'Wird nicht renamed wenn es die Datei schon gibt
@@ -748,38 +749,38 @@ Public Property Get Length() As Long
 End Property
 
 'Functions for Writing to and Reading from files
-Public Function OpenFile(fm As FileMode) As Integer
-    m_fm = fm
-Try: On Error GoTo Catch
-    If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
-    m_FNr = FreeFile
-    Select Case m_fm
-    Case fmBinary_Read
-        
-        Open m_PFN For Binary Access Read As m_FNr
-        
-    Case fmBinary_Write
-        
-        Open m_PFN For Binary Access Write As m_FNr
-        
-    Case fmBinary_ReadWrite
-        
-        Open m_PFN For Binary As m_FNr
-        
-    Case fmText_Read
-        
-        Open m_PFN For Input As m_FNr
-        
-    Case fmText_Write
-        
-        Open m_PFN For Output As m_FNr
-        
-    End Select
-    OpenFile = m_FNr
-    Exit Function
-Catch:
-    ErrHandler "OpenFile", m_PFN
-End Function
+'Public Function OpenFile(fm As FileMode) As Integer
+'    m_fm = fm
+'Try: On Error GoTo Catch
+'    If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
+'    m_FNr = FreeFile
+'    Select Case m_fm
+'    Case fmBinary_Read
+'
+'        Open m_PFN For Binary Access Read As m_FNr
+'
+'    Case fmBinary_Write
+'
+'        Open m_PFN For Binary Access Write As m_FNr
+'
+'    Case fmBinary_ReadWrite
+'
+'        Open m_PFN For Binary As m_FNr
+'
+'    Case fmText_Read
+'
+'        Open m_PFN For Input As m_FNr
+'
+'    Case fmText_Write
+'
+'        Open m_PFN For Output As m_FNr
+'
+'    End Select
+'    OpenFile = m_FNr
+'    Exit Function
+'Catch:
+'    ErrHandler "OpenFile", m_PFN
+'End Function
 
 'Friend Sub New_(aPath As String, Optional FMode As FileMode = FileMode_Random, Optional FAccess As FileAccess = FileAccess_ReadWrite, Optional FShare As FileShare = FileShare_None)
 'Private Function OOpen(ByVal aFMode As FileMode, ByVal aFAccess As FileAccess, ByVal aFShare As FileShare) As Boolean
@@ -792,16 +793,17 @@ Try: On Error GoTo Catch
     'aFShare = mFShare
     If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
     m_FNr = FreeFile
+    Dim pfn As String: pfn = Me.Value
     Select Case fm
     Case FileMode.FileMode_Append
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Append As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Append Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Append Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Append Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Append Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Shared As m_FNr
             End Select
         'Case FileAccess.FileAccess_Read 'Not Possible
         '    Select Case aFShare
@@ -813,73 +815,73 @@ Try: On Error GoTo Catch
         '    End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Append Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Append Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Append Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Append Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Append Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Append Access Read Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Append Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Append Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Append Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Append Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append Access Read Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Access Read Write Shared As m_FNr
             End Select
         End Select
     Case FileMode.FileMode_Binary
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Binary As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Binary Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Binary Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Binary Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Binary Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Binary Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Binary Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Binary Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Binary Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Binary Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Read Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Binary Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Binary Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Binary Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Binary Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Binary Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Binary Access Read Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Binary Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Binary Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Binary Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Binary Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Read Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Read Write Shared As m_FNr
             End Select
         End Select
     Case FileMode.FileMode_Input
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Input As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Input Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Input Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Input Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Input Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Input As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Input Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Input Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Input Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Input Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Input Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Input Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Input Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Input Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Input Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Input Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Input Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Input Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Input Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Input Access Read Shared As m_FNr
             End Select
         'Case FileAccess_Write 'Not Possible
         '    Select Case fs
@@ -902,11 +904,11 @@ Try: On Error GoTo Catch
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Output As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Output Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Output Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Output Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Output Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Output As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Output Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Output Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Output Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Output Shared As m_FNr
             End Select
 '        Case FileAccess_Read
 '            Select Case fs 'Not Possible
@@ -918,11 +920,11 @@ Try: On Error GoTo Catch
 '            End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Output Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Output Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Output Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Output Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Output Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Output Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Output Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Output Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Output Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Output Access Write Shared As m_FNr
             End Select
             '    Case FileAccess_ReadWrite
             '      Select Case fs 'Not Possible
@@ -937,35 +939,35 @@ Try: On Error GoTo Catch
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Random As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Random Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Random Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Random Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Random Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Random Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Random Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Random Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Random Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Random Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Read Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Random Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Random Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Random Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Random Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Random Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open mPath For Random Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open mPath For Random Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open mPath For Random Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open mPath For Random Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open mPath For Random Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Read Write Shared As m_FNr
             End Select
         End Select
     End Select
@@ -975,31 +977,13 @@ Catch:
     MsgBox "Error: " & CStr(Err.Number) & " in PFNStream::OOpen: " & Err.Description
 End Function
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Public Sub WriteStr(aStr As String)
 Try: On Error GoTo Catch
-    If m_FNr = 0 Then OpenFile fmBinary_Write
-    Select Case m_fm
-    Case fmBinary_Write
+    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Write
+    Select Case m_FMode
+    Case FileMode.FileMode_Binary
         Put #m_FNr, , aStr
-    Case fmText_Write
+    Case FileMode.FileMode_Output
         Write #m_FNr, aStr
     End Select
     Exit Sub
@@ -1009,13 +993,13 @@ End Sub
 
 Public Function ReadStr() As String
 Try: On Error GoTo Catch
-    If m_FNr = 0 Then OpenFile fmBinary_Read
+    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Read ' fmBinary_Read
     Dim aStr As String
-    Select Case m_fm
-    Case FileMode.fmBinary_Read
+    Select Case m_FMode
+    Case FileMode.FileMode_Binary 'fmBinary_Read
         aStr = Space(LOF(m_FNr))
         Get #m_FNr, , aStr
-    Case FileMode.fmText_Read
+    Case FileMode.FileMode_Input 'fmText_Read
         Input #m_FNr, aStr
     End Select
     ReadStr = aStr
@@ -1027,7 +1011,7 @@ End Function
 Public Sub CloseFile()
     If m_FNr = 0 Then Exit Sub
 Try: On Error GoTo Catch
-    Close #m_FNr
+    Close m_FNr
     m_FNr = 0
     Exit Sub
 Catch:
@@ -1037,23 +1021,33 @@ End Sub
 
 ' v ############################## v '   Private Parsers    ' v ############################## v '
 Private Function Get_Drive(PFN_in As String) As String
-    'can be either like "C:\" or like "\\Server\" (UNC);
+'  "\\?\",
+    'can be either like "C:\" or like "\\Server\Data\" (UNC);
     'a local drive contains ":", a network-drive contains "\\" at the beginning;
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos As Long: pos = InStr(1, PFN_in, ":")
+    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
     If 0 < pos And pos < 3 Then
         s = Left$(PFN_in, pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
         pos = InStr(3, PFN_in, "\")
         If pos = 0 Then
-            If Right$(PFN_in, 1) <> "\" Then s = PFN_in & "\"
+            If Right$(PFN_in, 1) <> "\" Then
+                s = PFN_in & "\"
+            End If
         ElseIf pos > 2 Then
+            'read to the next "\"
+            'pos2 = pos
+            pos2 = InStr(pos + 1, PFN_in, "\")
+            If pos2 > 0 Then pos = Max(pos, pos2)
             s = Left$(PFN_in, pos)
         End If
     End If
     Get_Drive = s
+End Function
+Private Function Max(V1, V2)
+    If V1 > V2 Then Max = V1 Else Max = V2
 End Function
 Private Sub Let_Drive(ByRef PFN_out As String, ByVal Value As String)
     'OM TODO: make valid Drive from given Value
@@ -1252,6 +1246,10 @@ End Function
 '
 
 Private Function MakeValid(ByRef aStrPath As String) As Boolean
+'Die funktion MakeValid sollte die Bestandteile des Pfades getrennt voneinander validieren
+'   Drive, Path, Filename, Extension
+'Dazu muss erstmal der String in ein parsbares format gebracht werden.
+
     'Nullen von hinten entfernen
 Try: On Error GoTo Catch
     aStrPath = Trim$(aStrPath)
@@ -1265,7 +1263,7 @@ Try: On Error GoTo Catch
     Case 47: X = X & "\"
     End Select
     aStrPath = RemoveChars(aStrPath, X)
-    aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2)
+    aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
@@ -1383,5 +1381,3 @@ End Function
 '         Extension   : ".txt"
 '         PathOnly    : ""
 '         FileNameOnly: ""
-
-

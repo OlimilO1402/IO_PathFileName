@@ -21,6 +21,7 @@ End Function
 
 Public Function RecursiveReplaceSL(ByVal Expression As String, ByVal Find As String, ByVal Replace As String, Optional ByVal Start As Long = 1, Optional ByVal Length As Long = -1) As String
     'check input parameters return early if necessary
+    'Ja so ein Schmarrn was is denn des für ein Schwachsinn?
     If Length < 0 And Start = 1 Then RecursiveReplaceSL = RecursiveReplace(Expression, Find, Replace): Exit Function
     Dim le As Long: le = Len(Expression)
     If Start < 1 Or le < Start Then Exit Function 'return nothing
@@ -29,7 +30,7 @@ Public Function RecursiveReplaceSL(ByVal Expression As String, ByVal Find As Str
     'for debugging:
     Dim sl As String: sl = Left$(Expression, Start - 1)
     Dim sr As String: sr = Mid$(Expression, Length + 1)
-    Expression = RecursiveReplace(Mid$(Expression, Start, Length), Find, Replace)
+    Expression = RecursiveReplace(Mid$(Expression, Start, Length - 1), Find, Replace)
     RecursiveReplaceSL = sl & Expression & sr
     'same but shorter and less noise:
     'RecursiveReplaceSL = Left$(Expression, Start - 1) & RecursiveReplace(Mid$(Expression, Start, Length)) & Mid$(Expression, Start, Length)

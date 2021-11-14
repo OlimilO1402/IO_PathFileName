@@ -1,38 +1,86 @@
 VERSION 5.00
 Begin VB.Form Form1 
    Caption         =   "Testing class PathFileName"
-   ClientHeight    =   9840
+   ClientHeight    =   9780
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   9975
+   ClientWidth     =   10215
    Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   9840
-   ScaleWidth      =   9975
+   ScaleHeight     =   9780
+   ScaleWidth      =   10215
    StartUpPosition =   3  'Windows-Standard
-   Begin VB.CommandButton BtnTestExists 
-      Caption         =   "Exists"
+   Begin VB.CommandButton Command2 
+      Caption         =   "Delete PathFileName"
       Height          =   375
       Left            =   8280
-      TabIndex        =   34
-      Top             =   1320
-      Width           =   1575
+      TabIndex        =   41
+      Top             =   4560
+      Width           =   1815
+   End
+   Begin VB.CommandButton Command1 
+      Caption         =   "Move PathFileName"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   40
+      Top             =   4200
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathFileNameCreate 
+      Caption         =   "Create PathFilename"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   39
+      Top             =   3840
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathDelete 
+      Caption         =   "Delete Path"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   42
+      Top             =   3360
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathCreate 
+      Caption         =   "Create Path"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   37
+      Top             =   3000
+      Width           =   1815
    End
    Begin VB.CommandButton BtnTestStartWaitCalc 
       Caption         =   "Start and wait"
       Height          =   375
       Left            =   8280
       TabIndex        =   33
-      Top             =   2160
-      Width           =   1575
+      Top             =   2520
+      Width           =   1815
    End
    Begin VB.CommandButton BtnTestStartCalc 
       Caption         =   "Start calc"
       Height          =   375
       Left            =   8280
       TabIndex        =   32
-      Top             =   1800
-      Width           =   1575
+      Top             =   2160
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnTestExists 
+      Caption         =   "Exists"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   34
+      Top             =   1680
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnTestPathExists 
+      Caption         =   "Path Exists"
+      Height          =   375
+      Left            =   8280
+      TabIndex        =   38
+      Top             =   1320
+      Width           =   1815
    End
    Begin VB.CommandButton BtnIsPathOrFile 
       Caption         =   "IsPath/IsFile"
@@ -40,7 +88,7 @@ Begin VB.Form Form1
       Left            =   8280
       TabIndex        =   31
       Top             =   960
-      Width           =   1575
+      Width           =   1815
    End
    Begin VB.CommandButton BtnUserPath 
       Caption         =   "User-Path"
@@ -48,7 +96,7 @@ Begin VB.Form Form1
       Left            =   8280
       TabIndex        =   30
       Top             =   480
-      Width           =   1575
+      Width           =   1815
    End
    Begin VB.CommandButton BtnTempPath 
       Caption         =   "Temp-Path"
@@ -56,7 +104,7 @@ Begin VB.Form Form1
       Left            =   8280
       TabIndex        =   29
       Top             =   120
-      Width           =   1575
+      Width           =   1815
    End
    Begin VB.CommandButton BtnFileName 
       Caption         =   "/"
@@ -186,10 +234,10 @@ Begin VB.Form Form1
    End
    Begin VB.ListBox LstBsps 
       Height          =   6300
-      Left            =   120
+      Left            =   0
       TabIndex        =   0
       Top             =   3480
-      Width           =   8055
+      Width           =   8175
    End
    Begin VB.Label Label1 
       Caption         =   "Label1"
@@ -336,14 +384,16 @@ Private m_PFN As PathFileName
 Private Sub BtnIsPathOrFile_Click()
     MsgBox "it's a " & IIf(m_PFN.IsFile, "file", "path") & vbCrLf & m_PFN.Value
 End Sub
-
+Private Sub BtnTestPathExists_Click()
+    MsgBox "PathExists? " & vbCrLf & m_PFN.PathExists & vbCrLf & m_PFN.Path
+End Sub
 Private Sub BtnTestExists_Click()
     MsgBox "Exists? " & vbCrLf & m_PFN.Exists & vbCrLf & m_PFN.Value
 End Sub
 
 Private Sub BtnTestStartCalc_Click()
-    Set m_PFN = MNew.PathFileName("Calc.exe")
-    Call View_Update:    m_PFN.Start
+    Dim CalcExe As PathFileName: Set CalcExe = MNew.PathFileName("Calc.exe")
+    CalcExe.Start
 End Sub
 
 Private Sub BtnTestStartWaitCalc_Click()
@@ -351,6 +401,49 @@ Private Sub BtnTestStartWaitCalc_Click()
     m_PFN.StartWait
     MsgBox "Program ClickMe terminated", , Me.Caption & " function StartWait"
 End Sub
+
+Private Sub BtnPathCreate_Click()
+    Dim s As String: s = TxtPFN.Text
+    If Len(s) = 0 Then Exit Sub
+    Set m_PFN = MNew.PathFileName(TxtPFN.Text)
+    If m_PFN.PathExists Then
+        MsgBox "Path already exists: " & vbCrLf & m_PFN.Path
+    Else
+        m_PFN.PathCreate
+        MsgBox IIf(m_PFN.PathExists, "Path successfully created: ", "Could not create Path: ") & vbCrLf & m_PFN.Path
+    End If
+End Sub
+Private Sub BtnPathDelete_Click()
+    Dim s As String: s = TxtPFN.Text
+    If Len(s) = 0 Then Exit Sub
+    Set m_PFN = MNew.PathFileName(TxtPFN.Text)
+    If m_PFN.PathExists Then
+        m_PFN.PathDelete
+        If m_PFN.PathExists Then
+            MsgBox "Could not delete path: " & vbCrLf & m_PFN.Path
+        End If
+    Else
+        MsgBox "There is nothing to delete, there is no path, named: " & vbCrLf & m_PFN.Path
+    End If
+End Sub
+
+Private Sub BtnCreatePathFileName_Click()
+    Dim s As String: s = TxtPFN.Text
+    If Len(s) = 0 Then Exit Sub
+    Set m_PFN = MNew.PathFileName(TxtPFN.Text)
+    If Not m_PFN.PathExists Then m_PFN.PathCreate
+    If m_PFN.PathExists Then
+        If m_PFN.Exists Then
+            MsgBox "PathFileName already exists: " & vbCrLf & m_PFN.Value
+        Else
+            m_PFN.WriteStr "Testfile"
+            MsgBox IIf(m_PFN.Exists, "PathFileName successfully created: ", "Could not create PathFileName: ") & vbCrLf & m_PFN.Value
+        End If
+    Else
+        MsgBox "Could not create Path: " & vbCrLf & m_PFN.Path
+    End If
+End Sub
+
 
 Private Sub Form_Load():             Call AddExamples:                          CreatePFN 0: End Sub
 Private Sub BtnDrive_Click():        m_PFN.Drive = TxtDrive.Text:               View_Update: End Sub
@@ -391,6 +484,9 @@ Private Sub View_Update()
     LblPathCount.Caption = m_PFN.PathCount
     LblPathOrFile.Caption = IIf(m_PFN.IsFile, "file", "path")
     
+    'li = LstBsps.ListIndex
+    'LstBsps.List(li) = m_PFN.Value
+    
     Dim i As Long
     For i = 0 To m_PFN.PathCount - 1
         LstPaths.AddItem m_PFN.PathI(i)
@@ -414,6 +510,7 @@ Private Sub AddExamples()
     View_Clear
     'vollständiger Pfad: Datei auf lokalem Laufwerk
     LstBsps.AddItem "C:\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
+    LstBsps.AddItem "\\SOLS_DS\Daten\TestDir\Unterverzeichnis\Datei.txt"
     'vollständiger Pfad: Datei auf Netzwerk-Laufwerk
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
     'Wenn Teile fehlen
