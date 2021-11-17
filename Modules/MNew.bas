@@ -7,32 +7,27 @@ Public Function PathFileName(ByVal aPathOrPFN As String, _
     Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
 End Function
 
-Public Function RecursiveReplace(ByVal Expression As String, ByVal Find As String, ByVal Replace As String) As String
-    Dim pos As Long: pos = InStr(1, Expression, Find)
-    If pos Then
-        Dim r As String: r = VBA.Replace(Expression, Find, Replace)
-        'check for stack overflow:
-        If (r = Expression) Or (Len(Expression) < Len(r)) Then RecursiveReplace = r: Exit Function
-        RecursiveReplace = RecursiveReplace(r, Find, Replace)
-    Else
-        RecursiveReplace = Expression
-    End If
+'Function IsInIDE() As Boolean
+'Try: On Error GoTo Catch
+'    Debug.Print 1 / 0
+'    IsInIDE = False: Exit Function
+'Catch: IsInIDE = True
+'End Function
+Function IsInIDE() As Boolean
+    IsInIDE = App.LogMode = 0 'LogModeConstants.vbLogAuto
 End Function
 
-Public Function RecursiveReplaceSL(ByVal Expression As String, ByVal Find As String, ByVal Replace As String, Optional ByVal Start As Long = 1, Optional ByVal Length As Long = -1) As String
-    'check input parameters return early if necessary
-    'Ja so ein Schmarrn was is denn des für ein Schwachsinn?
-    If Length < 0 And Start = 1 Then RecursiveReplaceSL = RecursiveReplace(Expression, Find, Replace): Exit Function
-    Dim le As Long: le = Len(Expression)
-    If Start < 1 Or le < Start Then Exit Function 'return nothing
-    If Length < 1 Or le < Start + Length Then Length = le - Start + 1
-    
-    'for debugging:
-    Dim sl As String: sl = Left$(Expression, Start - 1)
-    Dim sr As String: sr = Mid$(Expression, Length + 1)
-    Expression = RecursiveReplace(Mid$(Expression, Start, Length - 1), Find, Replace)
-    RecursiveReplaceSL = sl & Expression & sr
-    'same but shorter and less noise:
-    'RecursiveReplaceSL = Left$(Expression, Start - 1) & RecursiveReplace(Mid$(Expression, Start, Length)) & Mid$(Expression, Start, Length)
+Function LogModeConstants_ToStr(e As LogModeConstants) As String
+    Dim s As String
+    Select Case e
+    Case LogModeConstants.vbLogAuto:      s = "vbLogAuto"      ' 0
+    Case LogModeConstants.vbLogOff:       s = "vbLogOff"       ' 1
+    Case LogModeConstants.vbLogToFile:    s = "vbLogToFile"    ' 2
+    Case LogModeConstants.vbLogToNT:      s = "vbLogToNT"      ' 3
+    Case LogModeConstants.vbLogOverwrite: s = "vbLogOverwrite" '16 &H10
+    Case LogModeConstants.vbLogThreadID:  s = "vbLogThreadID"  '32 &H20
+    Case Else: s = CStr(e)
+    End Select
+    LogModeConstants_ToStr = s
 End Function
 

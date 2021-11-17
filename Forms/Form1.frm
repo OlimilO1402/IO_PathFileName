@@ -456,6 +456,14 @@ Private Sub BtnPFN_Click():      Set m_PFN = MNew.PathFileName(TxtPFN.Text):    
 Private Sub BtnTempPath_Click():    MsgBox m_PFN.TempPath: End Sub
 Private Sub BtnUserPath_Click():    MsgBox m_PFN.UserPath: End Sub
 
+Private Sub Form_Resize()
+    Dim L As Single: L = LstBsps.Left
+    Dim T As Single: T = LstBsps.Top
+    Dim W As Single: W = LstBsps.Width 'Me.ScaleWidth
+    Dim H As Single: H = Me.ScaleHeight - T
+    If W > 0 And H > 0 Then LstBsps.Move L, T, W, H
+End Sub
+
 Private Sub LstBsps_Click()
     CreatePFN LstBsps.ListIndex
 End Sub
