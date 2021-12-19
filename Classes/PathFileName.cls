@@ -546,9 +546,9 @@ End Function
 Public Function PathUp() As PathFileName
     Dim p As String: p = m_PFN
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
-    Dim pos As Long: pos = InStrRev(p, "\")
-    If pos > 0 Then
-        Set PathUp = New_PathFileName(Left(p, pos))
+    Dim Pos As Long: Pos = InStrRev(p, "\")
+    If Pos > 0 Then
+        Set PathUp = New_PathFileName(Left(p, Pos))
     End If
 End Function
 
@@ -608,9 +608,9 @@ Public Function PathExists() As Boolean
     'Runtime-Error  76 Path not found
     'just go ahead
     PathExists = CBool(GetAttr(p) And vbDirectory)
-    If Not IsInIDE Then
-        PathExists = CBool(GetAttr(p) And vbDirectory)
-    End If
+    'If Not IsInIDE Then
+    '    PathExists = CBool(GetAttr(p) And vbDirectory)
+    'End If
     On Error GoTo 0
 End Function
 
@@ -685,9 +685,10 @@ Try:  On Error GoTo Catch
     Set CopyRetryLoop = newPathFileName
     Exit Function
 Catch:
-    Dim rv As VbMsgBoxResult: rv = MessErrorRetry(Me, "CopyTo", m_PFN & vbCrLf & newPathFileName.Value)
+    Dim rv As VbMsgBoxResult: rv = ErrHandler("CopyRetryLoop", m_PFN & vbCrLf & newPathFileName.Value, False, , , True)
+    ' MessErrorRetry(Me, "CopyTo", m_PFN & vbCrLf & newPathFileName.Value)
     If rv = vbRetry Then
-        GoTo Try 'yes we use goto here, since the user has the choice to stop it anytime
+        Resume Try 'the user has the choice to stop it anytime
     Else
         Set CopyRetryLoop = Nothing
         Exit Function
@@ -743,11 +744,14 @@ CatchE:
     ErrHandler "Rename", ToPFN
 End Function
 
-Public Property Get Length() As Long
+Public Property Get length() As Long
     'Returns the length or size of the file in bytes
-    If m_FNr Then Length = LOF(m_FNr) Else Length = FileLen(m_PFN)
+    If m_FNr Then length = LOF(m_FNr) Else length = FileLen(m_PFN)
 End Property
 
+Public Property Get Pos() As Long
+    Pos = Seek(m_FNr)
+End Property
 'Functions for Writing to and Reading from files
 'Public Function OpenFile(fm As FileMode) As Integer
 '    m_fm = fm
@@ -1008,6 +1012,14 @@ Catch:
     ErrHandler "ReadStr", m_PFN
 End Function
 
+Public Function ReadLine() As String
+    If m_FMode = FileMode.FileMode_Input Then
+        Line Input #m_FNr, ReadLine
+    Else
+        'wenn binary dann bis zum, nächsten vbcr, vblf oder vbcrlf lesen
+    End If
+End Function
+
 Public Sub CloseFile()
     If m_FNr = 0 Then Exit Sub
 Try: On Error GoTo Catch
@@ -1027,21 +1039,21 @@ Private Function Get_Drive(PFN_in As String) As String
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
-    If 0 < pos And pos < 3 Then
-        s = Left$(PFN_in, pos) & "\"
+    Dim pos2 As Long, Pos As Long: Pos = InStr(1, PFN_in, ":")
+    If 0 < Pos And Pos < 3 Then
+        s = Left$(PFN_in, Pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
-        pos = InStr(3, PFN_in, "\")
-        If pos = 0 Then
+        Pos = InStr(3, PFN_in, "\")
+        If Pos = 0 Then
             If Right$(PFN_in, 1) <> "\" Then
                 s = PFN_in & "\"
             End If
-        ElseIf pos > 2 Then
+        ElseIf Pos > 2 Then
             'read to the next "\"
             'pos2 = pos
-            pos2 = InStr(pos + 1, PFN_in, "\")
-            If pos2 > 0 Then pos = Max(pos, pos2)
-            s = Left$(PFN_in, pos)
+            pos2 = InStr(Pos + 1, PFN_in, "\")
+            If pos2 > 0 Then Pos = Max(Pos, pos2)
+            s = Left$(PFN_in, Pos)
         End If
     End If
     Get_Drive = s

@@ -378,17 +378,17 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit
+ioOption Explicit
 Private m_PFN As PathFileName
 
 Private Sub BtnIsPathOrFile_Click()
-    MsgBox "it's a " & IIf(m_PFN.IsFile, "file", "path") & vbCrLf & m_PFN.Value
+    MsgBox "it's a " & IIf(m_PFN.IsFile, "file", "path") & vbCrLf & m_PFN.value
 End Sub
 Private Sub BtnTestPathExists_Click()
     MsgBox "PathExists? " & vbCrLf & m_PFN.PathExists & vbCrLf & m_PFN.Path
 End Sub
 Private Sub BtnTestExists_Click()
-    MsgBox "Exists? " & vbCrLf & m_PFN.Exists & vbCrLf & m_PFN.Value
+    MsgBox "Exists? " & vbCrLf & m_PFN.Exists & vbCrLf & m_PFN.value
 End Sub
 
 Private Sub BtnTestStartCalc_Click()
@@ -434,10 +434,10 @@ Private Sub BtnCreatePathFileName_Click()
     If Not m_PFN.PathExists Then m_PFN.PathCreate
     If m_PFN.PathExists Then
         If m_PFN.Exists Then
-            MsgBox "PathFileName already exists: " & vbCrLf & m_PFN.Value
+            MsgBox "PathFileName already exists: " & vbCrLf & m_PFN.value
         Else
             m_PFN.WriteStr "Testfile"
-            MsgBox IIf(m_PFN.Exists, "PathFileName successfully created: ", "Could not create PathFileName: ") & vbCrLf & m_PFN.Value
+            MsgBox IIf(m_PFN.Exists, "PathFileName successfully created: ", "Could not create PathFileName: ") & vbCrLf & m_PFN.value
         End If
     Else
         MsgBox "Could not create Path: " & vbCrLf & m_PFN.Path
@@ -480,7 +480,7 @@ End Sub
 Private Sub View_Update()
     Dim li As Long: li = LstPaths.ListIndex
     View_Clear
-    TxtPFN.Text = m_PFN.Value
+    TxtPFN.Text = m_PFN.value
     LblPFNQuoted.Caption = m_PFN.Quoted
     LblPFNShorted.Caption = m_PFN.Shorted(35)
     TxtDrive.Text = m_PFN.Drive

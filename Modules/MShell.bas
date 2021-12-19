@@ -8,9 +8,9 @@ Attribute VB_Name = "MShell"
 Option Explicit 'OM 06.11.2015 13:45; Zeilen: 118
 'And Win64
 #If VBA7 = 0 Then
-    Public Enum LongPtr
-        [_]
-    End Enum
+    'Private Enum LongPtr
+    '    [_]
+    'End Enum
 #End If
 
 Private Type STARTUPINFO       ' x86,   x64
