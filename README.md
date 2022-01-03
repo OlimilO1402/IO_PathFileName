@@ -42,6 +42,6 @@ it assumes that every pathfilename consists of the following parts:
 * Create a shorted string of x chars to use in history-lists  
 * Get a pointer to a string-buffer to use it in WinAPI-functions  
 * Uses mostly VB-functions and as less WinAPI-functions as needed  
-* Works in VBC, VBA, VBA7, x86 and x64  
+* Works in VBC, VBA, VBA7, x86 and x64 and Unicode  
 
 ![PathFileName Image](Resources/PathFileName.png "PathFileName Image")
