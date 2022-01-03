@@ -47,6 +47,8 @@ Private Type PROCESS_INFORMATION
     dwThreadID  As Long
 End Type
 
+'https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
+
 #If VBA7 Then
     
     Private Declare PtrSafe Function CreateProcessW Lib "kernel32" ( _
@@ -75,7 +77,7 @@ End Type
         lpThreadAttr As Any, _
         ByVal lpInheritedHandle As LongPtr, _
         ByVal lpCreationFlags As LongPtr, _
-        ByVal lpEnv As Any, _
+        ByVal lpEnv As LongPtr, _
         ByVal lpCurDir As LongPtr, _
         lpStartupInfo As STARTUPINFO, _
         lpProcessInfo As PROCESS_INFORMATION _
@@ -109,7 +111,7 @@ Public Function ShellWait(ByVal PathName As String, _
     With StartInfo
         
         .cb = LenB(StartInfo) 'x86: 68; Win64: 96
-        Debug.Print .cb
+        'Debug.Print .cb
         .dwFlags = STARTF_USESHOWWINDOW
         .wShowWindow = WindowStyle
         
@@ -117,25 +119,31 @@ Public Function ShellWait(ByVal PathName As String, _
     
     Dim ProcessInfo    As PROCESS_INFORMATION
     Dim lpEnvironment  As LongPtr
-    If CreateProcessW(StrPtr(vbNullString), StrPtr(PathName), AttrProc, AttrThrd, False, CreationFlags, lpEnvironment, WorkDir, StartInfo, ProcessInfo) <> False Then
-        
-        With ProcessInfo
-            If .hProcess <> 0 Then
-                
-                Dim dwMilliSeconds As Long: dwMilliSeconds = 500
-                
-                Do While WaitForSingleObject(.hProcess, dwMilliSeconds) = WAIT_TIMEOUT
-                    DoEvents
-                Loop
-                
-            End If
-            
-            CloseHandle .hProcess
-            
-        End With
-    Else
-        MsgBox "Could not create Process"
+    Dim lpInheritHnd   As LongPtr
+    Dim hr As LongPtr
+    Dim nul As LongPtr
+    
+    'hr = CreateProcessW(nul, StrPtr(PathName), AttrProc, AttrThrd, lpInheritHnd, CreationFlags, lpEnvironment, nul, StartInfo, ProcessInfo)
+    hr = CreateProcessW(nul, StrPtr(PathName), AttrProc, AttrThrd, nul, CreationFlags, nul, nul, StartInfo, ProcessInfo)
+    
+    If hr = 0 Then
+        MErr.MessError "MShell", "ShellWait", PathName, hr
+        Exit Function
     End If
+    With ProcessInfo
+        If .hProcess <> 0 Then
+            
+            Dim dwMilliSeconds As Long: dwMilliSeconds = 500
+            
+            Do While WaitForSingleObject(.hProcess, dwMilliSeconds) = WAIT_TIMEOUT
+                DoEvents
+            Loop
+            
+        End If
+        Debug.Print "CloseHandle .hProcess"
+        CloseHandle .hProcess
+        
+    End With
 End Function
 '
 '#Else

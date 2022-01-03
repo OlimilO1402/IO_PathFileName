@@ -32,7 +32,9 @@ Attribute VB_Exposed = False
 '      Path (=Drive+OnlyPath)    |  Filename
 '  C:\Windows\System32\          |  user32.dll
 
-Option Explicit 'OM 06.11.2015 13:45; Zeilen: 336
+Option Explicit
+'OM 06.11.2015 13:45; Zeilen:  336
+'OM 2022-01-03 15:46; Zeilen: 1386
 #If VBA7 Then
     Private Declare PtrSafe Function ShellExecuteW Lib "shell32" ( _
         ByVal hwnd As LongPtr, _
@@ -164,8 +166,8 @@ End Function
 
 'internal ctor
 Private Function New_PathFileName(ByVal aPathFileName As String, _
-                Optional ByVal aFileName As String, _
-                Optional ByVal aExt As String) As PathFileName
+                         Optional ByVal aFileName As String, _
+                         Optional ByVal aExt As String) As PathFileName
     Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
 
@@ -210,10 +212,10 @@ Public Property Let PathOnly(ByVal Value As String)
     Let_PathOnly m_PFN, Value
 End Property
 
-Public Property Get Path() As String
-    Path = Get_Path(m_PFN)
+Public Property Get path() As String
+    path = Get_Path(m_PFN)
 End Property
-Public Property Let Path(ByVal Value As String)
+Public Property Let path(ByVal Value As String)
     Let_Path m_PFN, Value
 End Property
 
@@ -319,7 +321,6 @@ Public Property Get IsValid() As Boolean
 End Property
 ' ^ ####################### ^ ' Public ReadOnly Boolean Properties ' ^ ####################### ^ '
 
-
 ' v ############################## v '   Public Functions   ' v ############################## v '
 
 '#If VBA7 Then
@@ -335,7 +336,7 @@ Try:     On Error GoTo Catch
             Set p = p.PathUp
         Loop
         If Not p Is Nothing Then
-            ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
+            ret = Shell("Explorer.exe " & p.path, vbNormalFocus)
         End If
         Exit Function
     Else
@@ -348,7 +349,7 @@ Try:     On Error GoTo Catch
             'ein Dokument
             Dim hwnd As LongPtr
             'Debug.Print m_PFN
-            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
+            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.path), WindowStyle)
         End If
     End If
     Start = ret
@@ -357,22 +358,22 @@ Catch:
     ErrHandler "Start"
 End Function
     
-Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String) As Long
-Try:     On Error GoTo Catch
+Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String = "") As Long
+Try: On Error GoTo Catch
     'startet und wartet = synchron
     'geht jetzt nur bei exe (oder bat?)
     Dim e As String: e = UCase(Me.Extension)
-    If Not (e = "EXE" Or e = "BAT") Then
+    If Not (e = ".EXE" Or e = ".BAT" Or e = ".COM") Then
         MsgBox "Nur ausführbare Programme (exe) können gestartet werden, Dateiendung: " & Me.Extension
         Exit Function
     End If
-    Dim ret As LongPtr
     Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-    ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
+    'Cmd = "C:\Windows\Calc.exe"
+    Dim ret As LongPtr: ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
     'StartWait = ret
     Exit Function
 Catch:
-    ErrHandler "StartWait"
+    ErrHandler "StartWait", m_PFN, ret
 End Function
     
 '#Else 'VBA6, VBC
@@ -489,26 +490,30 @@ End Function
 'End Function
 
 Public Function PathCreate(Optional ByVal sNewDir As String) As Boolean
-TryE: On Error GoTo CatchE
+Try: On Error GoTo Catch
     'ein neues Verzeichnis mit Unterverzeichnissen anlegen
-    If Len(sNewDir) = 0 Then sNewDir = Me.Path
+    If Len(sNewDir) = 0 Then sNewDir = Me.path
     Call MakeValid(sNewDir)
-    Dim NewDir As PathFileName: Set NewDir = New_PathFileName(sNewDir)
-    'zuerst in das jeweilige Laufwerk wechseln
-    Dim sd As String: sd = NewDir.Drive()
-    Call ChDir(sd)
-    Dim i As Long
-    For i = 0 To NewDir.PathCount - 1
-        sd = NewDir.PathI(i)
-        'das Verzeichnis anlegen
-        Call MkDir(sd)
-        'gleich ins verzeichnis wechseln, damit das nächste
-        'Unterverzeichnis angelegt werden kann
-        Call ChDir(sd)
-    Next
+    Dim hr As Long
+    hr = MakeSureDirectoryPathExists(StrPtr(StrConv(sNewDir, vbFromUnicode)))
+    If hr = 0 Then GoTo Catch
+    'Makesuredirectorypathexits
+'    Dim NewDir As PathFileName: Set NewDir = New_PathFileName(sNewDir)
+'    'zuerst in das jeweilige Laufwerk wechseln
+'    Dim sd As String: sd = NewDir.Drive()
+'    Call ChDir(sd)
+'    Dim i As Long
+'    For i = 0 To NewDir.PathCount - 1
+'        sd = NewDir.PathI(i)
+'        'das Verzeichnis anlegen
+'        Call MkDir(sd)
+'        'gleich ins verzeichnis wechseln, damit das nächste
+'        'Unterverzeichnis angelegt werden kann
+'        Call ChDir(sd)
+'    Next
     PathCreate = True
     Exit Function
-CatchE:
+Catch:
     ErrHandler "PathCreate", "Could not create path: " & vbCrLf & sNewDir
 End Function
 '
@@ -531,7 +536,7 @@ End Function
 Public Function PathDelete(Optional ByVal sDelDir As String) As Boolean
 Try: On Error GoTo Catch
     If Len(sDelDir) = 0 Then
-        sDelDir = Me.Path
+        sDelDir = Me.path
         If Me.Exists() Then Exit Function
     End If
     'Call RemoveDirectoryA(deldir)
@@ -546,9 +551,9 @@ End Function
 Public Function PathUp() As PathFileName
     Dim p As String: p = m_PFN
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
-    Dim Pos As Long: Pos = InStrRev(p, "\")
-    If Pos > 0 Then
-        Set PathUp = New_PathFileName(Left(p, Pos))
+    Dim pos As Long: pos = InStrRev(p, "\")
+    If pos > 0 Then
+        Set PathUp = New_PathFileName(Left(p, pos))
     End If
 End Function
 
@@ -576,11 +581,11 @@ Public Function ChangeExt(newExtension As String) As PathFileName
 End Function
 Public Function AddToFileNameR(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameR = New_PathFileName(Me.Path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameR = New_PathFileName(Me.path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
 End Function
 Public Function AddToFileNameL(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameL = New_PathFileName(Me.Path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameL = New_PathFileName(Me.path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
 End Function
 
 Public Function Exists() As Boolean
@@ -592,7 +597,7 @@ Public Function Exists() As Boolean
     'If Me.IsFile Then
         Exists = Not CBool(GetAttr(m_PFN) And (vbDirectory Or vbVolume))
     Else
-        Dim p As String: p = Me.Path
+        Dim p As String: p = Me.path
         Exists = CBool(GetAttr(p) And vbDirectory)
     End If
     On Error GoTo 0
@@ -602,7 +607,7 @@ Public Function PathExists() As Boolean
     'checks only whether the path exists
     'Überprüft nur ob das Verzeichnis existiert
     On Error Resume Next
-    Dim p As String: p = Me.Path
+    Dim p As String: p = Me.path
     'Extras->Optionen->Allgemein->Unterbrechen bei Fehlern->(*) Bei nicht verarbeiteten Fehlern
     'Laufzeitfehler 76 Pfad nicht gefunden
     'Runtime-Error  76 Path not found
@@ -653,7 +658,7 @@ Public Function CopyTo(newPathFileName As PathFileName, Optional bOverwrite As B
 Try: On Error GoTo Catch
     Dim newPFN As PathFileName
     If newPathFileName.IsPath Then
-        Set newPFN = New_PathFileName(newPathFileName.Path & Me.FileName)
+        Set newPFN = New_PathFileName(newPathFileName.path & Me.FileName)
     Else
         Set newPFN = newPathFileName
     End If
@@ -664,7 +669,7 @@ Try: On Error GoTo Catch
     End If
     'OK keep filename in case newPathFileName is not given
     If Not newPFN.PathExists Then
-        MsgBox "der Pfad existiert nicht: " & vbCrLf & newPFN.Path
+        MsgBox "der Pfad existiert nicht: " & vbCrLf & newPFN.path
         Exit Function
     End If
     FileCopy m_PFN, newPFN.Value
@@ -749,8 +754,8 @@ Public Property Get length() As Long
     If m_FNr Then length = LOF(m_FNr) Else length = FileLen(m_PFN)
 End Property
 
-Public Property Get Pos() As Long
-    Pos = Seek(m_FNr)
+Public Property Get pos() As Long
+    pos = Seek(m_FNr)
 End Property
 'Functions for Writing to and Reading from files
 'Public Function OpenFile(fm As FileMode) As Integer
@@ -1039,21 +1044,21 @@ Private Function Get_Drive(PFN_in As String) As String
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos2 As Long, Pos As Long: Pos = InStr(1, PFN_in, ":")
-    If 0 < Pos And Pos < 3 Then
-        s = Left$(PFN_in, Pos) & "\"
+    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
+    If 0 < pos And pos < 3 Then
+        s = Left$(PFN_in, pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
-        Pos = InStr(3, PFN_in, "\")
-        If Pos = 0 Then
+        pos = InStr(3, PFN_in, "\")
+        If pos = 0 Then
             If Right$(PFN_in, 1) <> "\" Then
                 s = PFN_in & "\"
             End If
-        ElseIf Pos > 2 Then
+        ElseIf pos > 2 Then
             'read to the next "\"
             'pos2 = pos
-            pos2 = InStr(Pos + 1, PFN_in, "\")
-            If pos2 > 0 Then Pos = Max(Pos, pos2)
-            s = Left$(PFN_in, Pos)
+            pos2 = InStr(pos + 1, PFN_in, "\")
+            If pos2 > 0 Then pos = Max(pos, pos2)
+            s = Left$(PFN_in, pos)
         End If
     End If
     Get_Drive = s
@@ -1120,7 +1125,7 @@ End Function
 Private Sub Let_FileNameOnly(ByRef PFN_out As String, ByVal Value As String)
     'ohne Pfad und Extension
     Value = Trim$(Value)
-    m_PFN = Me.Path & Value & Me.Extension
+    m_PFN = Me.path & Value & Me.Extension
 End Sub
 
 Private Function Get_Extension(PFN_in As String) As String
@@ -1133,7 +1138,7 @@ End Function
 Private Sub Let_Extension(ByRef PFN_out As String, ByVal Value As String)
     Value = Trim$(Value)
     If Left(Value, 1) <> "." Then Value = "." & Value
-    m_PFN = Me.Path & Me.FileNameOnly & Value
+    m_PFN = Me.path & Me.FileNameOnly & Value
 End Sub
 
 Private Function Get_FileName(PFN_in As String) As String
@@ -1304,15 +1309,20 @@ End Function
 ' v ############################## v '   Local ErrHandler   ' v ############################## v '
 Private Function ErrHandler(ByVal PrcName As String, _
                             Optional AddInfo As String, _
-                            Optional BolLoud As Boolean = True, _
+                            Optional WinApiErr, _
+                            Optional bLoud As Boolean = True, _
                             Optional bErrLog As Boolean = True, _
-                            Optional vbDecor As VbMsgBoxStyle = vbOKOnly Or vbCritical, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKOnly, _
                             Optional bRetry As Boolean) As VbMsgBoxResult
     'ErrHandler = GlobalErrHandler(Me, PrcName, AddInfo, BolLoud, bErrLog, vbDecor)
     If bRetry Then
-        ErrHandler = MessErrorRetry(TypeName(Me), PrcName, AddInfo, bErrLog)
+        
+        ErrHandler = MessErrorRetry(TypeName(Me), PrcName, AddInfo, WinApiErr, bErrLog)
+        
     Else
-        ErrHandler = MessError(TypeName(Me), PrcName, AddInfo, BolLoud, bErrLog, vbDecor)
+        
+        ErrHandler = MessError(TypeName(Me), PrcName, AddInfo, WinApiErr, bLoud, bErrLog, vbDecor)
+        
     End If
 End Function
 
