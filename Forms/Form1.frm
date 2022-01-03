@@ -470,8 +470,9 @@ Private Sub BtnTestStartCalc_Click()
 End Sub
 
 Private Sub BtnTestStartWaitCalc_Click()
-    'Dim ClickMe As PathFileName: Set ClickMe = MNew.PathFileName(App.path & "\ClickMe\ClickMe.exe")
-    Dim ClickMe As PathFileName: Set ClickMe = MNew.PathFileName("C:\TestDir\ClickMe\ClickMe.exe")
+    Dim ClickMe As PathFileName: Set ClickMe = MNew.PathFileName(App.path & "\ClickMe\ClickMe.exe")
+    'Dim ClickMe As PathFileName: Set ClickMe = MNew.PathFileName("C:\TestDir\ClickMe\ClickMe.exe")
+    If Not ClickMe.Exists Then Set ClickMe = MNew.PathFileName(App.path & "\ClickMe.exe")
     If Not ClickMe.Exists Then MsgBox "ClickMe.exe not found: " & vbCrLf & ClickMe.Value: Exit Sub
     ClickMe.StartWait
     MsgBox "Program ClickMe.exe terminated", , Me.Caption & " function StartWait"
