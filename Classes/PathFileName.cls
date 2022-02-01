@@ -47,9 +47,9 @@ Option Explicit
     Private Declare PtrSafe Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
 #Else
     'activate the Enum LongPtr if you do not want to declare it in another module, maybe because this is the only class you use
-    'Public Enum LongPtr
-    '    [_]
-    'End Enum
+    Private Enum LongPtr
+        [_]
+    End Enum
     Private Declare Function ShellExecuteW Lib "shell32" ( _
         ByVal hwnd As LongPtr, _
         ByVal lpOperation As LongPtr, _
@@ -294,11 +294,14 @@ End Property
 ' ^ ############################## ^ '  Public Properties   ' ^ ############################## ^ '
 
 ' v ####################### v ' Public ReadOnly Boolean Properties ' v ####################### v '
-Public Property Get IsSame(other As Object) As Boolean
-    IsSame = ObjPtr(Me) = ObjPtr(other)
+Public Property Get Equals(other As PathFileName) As Boolean
+    Equals = Me.Value = other.Value
 End Property
 Public Property Get IsEqual(other As PathFileName) As Boolean
     IsEqual = Me.Value = other.Value
+End Property
+Public Property Get IsSame(other As Object) As Boolean
+    IsSame = ObjPtr(Me) = ObjPtr(other)
 End Property
 Public Property Get IsPath() As Boolean
     If Me.PathExists Then
@@ -551,9 +554,9 @@ End Function
 Public Function PathUp() As PathFileName
     Dim p As String: p = m_PFN
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
-    Dim pos As Long: pos = InStrRev(p, "\")
-    If pos > 0 Then
-        Set PathUp = New_PathFileName(Left(p, pos))
+    Dim Pos As Long: Pos = InStrRev(p, "\")
+    If Pos > 0 Then
+        Set PathUp = New_PathFileName(Left(p, Pos))
     End If
 End Function
 
@@ -754,8 +757,12 @@ Public Property Get length() As Long
     If m_FNr Then length = LOF(m_FNr) Else length = FileLen(m_PFN)
 End Property
 
-Public Property Get pos() As Long
-    pos = Seek(m_FNr)
+Public Property Let Pos(ByVal Value As Long)
+    Seek m_FNr, Value
+End Property
+
+Public Property Get Pos() As Long
+    Pos = Seek(m_FNr)
 End Property
 'Functions for Writing to and Reading from files
 'Public Function OpenFile(fm As FileMode) As Integer
@@ -1044,21 +1051,21 @@ Private Function Get_Drive(PFN_in As String) As String
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
-    If 0 < pos And pos < 3 Then
-        s = Left$(PFN_in, pos) & "\"
+    Dim pos2 As Long, Pos As Long: Pos = InStr(1, PFN_in, ":")
+    If 0 < Pos And Pos < 3 Then
+        s = Left$(PFN_in, Pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
-        pos = InStr(3, PFN_in, "\")
-        If pos = 0 Then
+        Pos = InStr(3, PFN_in, "\")
+        If Pos = 0 Then
             If Right$(PFN_in, 1) <> "\" Then
                 s = PFN_in & "\"
             End If
-        ElseIf pos > 2 Then
+        ElseIf Pos > 2 Then
             'read to the next "\"
             'pos2 = pos
-            pos2 = InStr(pos + 1, PFN_in, "\")
-            If pos2 > 0 Then pos = Max(pos, pos2)
-            s = Left$(PFN_in, pos)
+            pos2 = InStr(Pos + 1, PFN_in, "\")
+            If pos2 > 0 Then Pos = Max(Pos, pos2)
+            s = Left$(PFN_in, Pos)
         End If
     End If
     Get_Drive = s

@@ -140,7 +140,7 @@ Public Function ShellWait(ByVal PathName As String, _
             Loop
             
         End If
-        Debug.Print "CloseHandle .hProcess"
+        'Debug.Print "CloseHandle .hProcess"
         CloseHandle .hProcess
         
     End With
