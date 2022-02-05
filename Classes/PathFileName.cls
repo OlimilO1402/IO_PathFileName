@@ -810,6 +810,9 @@ Try: On Error GoTo Catch
     If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
     m_FNr = FreeFile
     Dim pfn As String: pfn = Me.Value
+    m_FMode = fm
+    m_FAccess = fa
+    m_FShare = fs
     Select Case fm
     Case FileMode.FileMode_Append
         Select Case fa
@@ -1319,7 +1322,7 @@ Private Function ErrHandler(ByVal PrcName As String, _
                             Optional WinApiErr, _
                             Optional bLoud As Boolean = True, _
                             Optional bErrLog As Boolean = True, _
-                            Optional vbDecor As VbMsgBoxStyle = vbOKOnly, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKCancel, _
                             Optional bRetry As Boolean) As VbMsgBoxResult
     'ErrHandler = GlobalErrHandler(Me, PrcName, AddInfo, BolLoud, bErrLog, vbDecor)
     If bRetry Then
