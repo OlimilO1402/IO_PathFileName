@@ -158,7 +158,7 @@ Friend Sub New_(ByVal aPathOrPFN As String, _
     End If
 End Sub
 Friend Sub NewC(other As PathFileName) 'Copy-ctor
-    m_PFN = other.Value
+    m_PFN = other.value
 End Sub
 Friend Function Clone() As PathFileName
     Set Clone = New PathFileName: Clone.NewC Me 'Value = m_PFN
@@ -174,10 +174,10 @@ End Function
 ' ^ ############################## ^ '    Constructors      ' ^ ############################## ^ '
 
 ' v ############################## v '  Public Properties   ' v ############################## v '
-Public Property Get Value() As String
-    Value = m_PFN
+Public Property Get value() As String
+    value = m_PFN
 End Property
-Public Property Let Value(RHS As String)
+Public Property Let value(RHS As String)
     m_PFN = RHS
     m_IsValid = True 'you know what you do, otherwise use New_
 End Property
@@ -201,43 +201,43 @@ End Property
 Public Property Get Drive() As String
     Drive = Get_Drive(m_PFN)
 End Property
-Public Property Let Drive(ByVal Value As String)
-    Let_Drive m_PFN, Value
+Public Property Let Drive(ByVal value As String)
+    Let_Drive m_PFN, value
 End Property
 
 Public Property Get PathOnly() As String
     PathOnly = Get_PathOnly(m_PFN)
 End Property
-Public Property Let PathOnly(ByVal Value As String)
-    Let_PathOnly m_PFN, Value
+Public Property Let PathOnly(ByVal value As String)
+    Let_PathOnly m_PFN, value
 End Property
 
-Public Property Get path() As String
-    path = Get_Path(m_PFN)
+Public Property Get Path() As String
+    Path = Get_Path(m_PFN)
 End Property
-Public Property Let path(ByVal Value As String)
-    Let_Path m_PFN, Value
+Public Property Let Path(ByVal value As String)
+    Let_Path m_PFN, value
 End Property
 
 Public Property Get FileNameOnly() As String
     FileNameOnly = Get_FileNameOnly(m_PFN)
 End Property
-Public Property Let FileNameOnly(ByVal Value As String)
-    Let_FileNameOnly m_PFN, Value
+Public Property Let FileNameOnly(ByVal value As String)
+    Let_FileNameOnly m_PFN, value
 End Property
 
 Public Property Get Extension() As String
     Extension = Get_Extension(m_PFN)
 End Property
-Public Property Let Extension(ByVal Value As String)
-    Let_Extension m_PFN, Value
+Public Property Let Extension(ByVal value As String)
+    Let_Extension m_PFN, value
 End Property
 
 Public Property Get FileName() As String
     FileName = Get_FileName(m_PFN)
 End Property
-Public Property Let FileName(ByVal Value As String)
-    Let_FileName m_PFN, Value
+Public Property Let FileName(ByVal value As String)
+    Let_FileName m_PFN, value
 End Property
 
 Public Property Get PathCount() As Long
@@ -295,10 +295,10 @@ End Property
 
 ' v ####################### v ' Public ReadOnly Boolean Properties ' v ####################### v '
 Public Property Get Equals(other As PathFileName) As Boolean
-    Equals = Me.Value = other.Value
+    Equals = Me.value = other.value
 End Property
 Public Property Get IsEqual(other As PathFileName) As Boolean
-    IsEqual = Me.Value = other.Value
+    IsEqual = Me.value = other.value
 End Property
 Public Property Get IsSame(other As Object) As Boolean
     IsSame = ObjPtr(Me) = ObjPtr(other)
@@ -339,7 +339,7 @@ Try:     On Error GoTo Catch
             Set p = p.PathUp
         Loop
         If Not p Is Nothing Then
-            ret = Shell("Explorer.exe " & p.path, vbNormalFocus)
+            ret = Shell("Explorer.exe " & p.Path, vbNormalFocus)
         End If
         Exit Function
     Else
@@ -352,7 +352,7 @@ Try:     On Error GoTo Catch
             'ein Dokument
             Dim hwnd As LongPtr
             'Debug.Print m_PFN
-            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.path), WindowStyle)
+            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
         End If
     End If
     Start = ret
@@ -459,7 +459,7 @@ Public Function Shorted(Optional ByVal MaxLen As Long) As String
                 Dim d As Long: d = MaxLen - Len(Shorted)
                 If d > Len(PathOnly) Then
                 'wenn Pfad kleiner als der Rest dann zeige ganzen Dateinamen
-                    Shorted = Me.Value
+                    Shorted = Me.value
                 Else
                     Dim half As Long: half = d \ 2 - 2 '-2 wegen den Pünktchen
                     If half > 0 Then
@@ -495,7 +495,7 @@ End Function
 Public Function PathCreate(Optional ByVal sNewDir As String) As Boolean
 Try: On Error GoTo Catch
     'ein neues Verzeichnis mit Unterverzeichnissen anlegen
-    If Len(sNewDir) = 0 Then sNewDir = Me.path
+    If Len(sNewDir) = 0 Then sNewDir = Me.Path
     Call MakeValid(sNewDir)
     Dim hr As Long
     hr = MakeSureDirectoryPathExists(StrPtr(StrConv(sNewDir, vbFromUnicode)))
@@ -539,7 +539,7 @@ End Function
 Public Function PathDelete(Optional ByVal sDelDir As String) As Boolean
 Try: On Error GoTo Catch
     If Len(sDelDir) = 0 Then
-        sDelDir = Me.path
+        sDelDir = Me.Path
         If Me.Exists() Then Exit Function
     End If
     'Call RemoveDirectoryA(deldir)
@@ -584,11 +584,11 @@ Public Function ChangeExt(newExtension As String) As PathFileName
 End Function
 Public Function AddToFileNameR(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameR = New_PathFileName(Me.path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameR = New_PathFileName(Me.Path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
 End Function
 Public Function AddToFileNameL(ByVal addstr As String) As PathFileName
     Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameL = New_PathFileName(Me.path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
+    Set AddToFileNameL = New_PathFileName(Me.Path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
 End Function
 
 Public Function Exists() As Boolean
@@ -600,7 +600,7 @@ Public Function Exists() As Boolean
     'If Me.IsFile Then
         Exists = Not CBool(GetAttr(m_PFN) And (vbDirectory Or vbVolume))
     Else
-        Dim p As String: p = Me.path
+        Dim p As String: p = Me.Path
         Exists = CBool(GetAttr(p) And vbDirectory)
     End If
     On Error GoTo 0
@@ -610,7 +610,7 @@ Public Function PathExists() As Boolean
     'checks only whether the path exists
     'Überprüft nur ob das Verzeichnis existiert
     On Error Resume Next
-    Dim p As String: p = Me.path
+    Dim p As String: p = Me.Path
     'Extras->Optionen->Allgemein->Unterbrechen bei Fehlern->(*) Bei nicht verarbeiteten Fehlern
     'Laufzeitfehler 76 Pfad nicht gefunden
     'Runtime-Error  76 Path not found
@@ -661,7 +661,7 @@ Public Function CopyTo(newPathFileName As PathFileName, Optional bOverwrite As B
 Try: On Error GoTo Catch
     Dim newPFN As PathFileName
     If newPathFileName.IsPath Then
-        Set newPFN = New_PathFileName(newPathFileName.path & Me.FileName)
+        Set newPFN = New_PathFileName(newPathFileName.Path & Me.FileName)
     Else
         Set newPFN = newPathFileName
     End If
@@ -672,10 +672,10 @@ Try: On Error GoTo Catch
     End If
     'OK keep filename in case newPathFileName is not given
     If Not newPFN.PathExists Then
-        MsgBox "der Pfad existiert nicht: " & vbCrLf & newPFN.path
+        MsgBox "der Pfad existiert nicht: " & vbCrLf & newPFN.Path
         Exit Function
     End If
-    FileCopy m_PFN, newPFN.Value
+    FileCopy m_PFN, newPFN.value
     Set CopyTo = newPFN
     Exit Function
 Catch:
@@ -683,17 +683,17 @@ Catch:
         'File access denied? give it another try one or more, MsgBox retry
         Set CopyTo = CopyRetryLoop(newPFN, True)
     Else
-        ErrHandler "CopyTo", vbCrLf & m_PFN & vbCrLf & vbCrLf & newPFN.Value
+        ErrHandler "CopyTo", vbCrLf & m_PFN & vbCrLf & vbCrLf & newPFN.value
     End If
 End Function
 
 Private Function CopyRetryLoop(newPathFileName As PathFileName, Optional bOverwrite As Boolean = True) As PathFileName
 Try:  On Error GoTo Catch
-    FileCopy m_PFN, newPathFileName.Value
+    FileCopy m_PFN, newPathFileName.value
     Set CopyRetryLoop = newPathFileName
     Exit Function
 Catch:
-    Dim rv As VbMsgBoxResult: rv = ErrHandler("CopyRetryLoop", m_PFN & vbCrLf & newPathFileName.Value, False, , , True)
+    Dim rv As VbMsgBoxResult: rv = ErrHandler("CopyRetryLoop", m_PFN & vbCrLf & newPathFileName.value, False, , , True)
     ' MessErrorRetry(Me, "CopyTo", m_PFN & vbCrLf & newPathFileName.Value)
     If rv = vbRetry Then
         Resume Try 'the user has the choice to stop it anytime
@@ -713,7 +713,7 @@ Try: On Error GoTo Catch
     Me.Delete
     Exit Function
 Catch:
-    ErrHandler "MoveTo", m_PFN & vbCrLf & pfndst.Value
+    ErrHandler "MoveTo", m_PFN & vbCrLf & pfndst.value
 End Function
 
 Public Function Delete(Optional ByVal aPFN As String = vbNullString) As Boolean
@@ -738,13 +738,13 @@ TryE: On Error GoTo CatchE
     Dim Cmd     As String
     If Not RenFile.Exists Then
         'Wird nicht renamed wenn es die Datei schon gibt
-        Cmd = Chr(34) & Me.Value & Chr(34) & " " & Chr(34) & RenFile.Value & Chr(34)
+        Cmd = Chr(34) & Me.value & Chr(34) & " " & Chr(34) & RenFile.value & Chr(34)
         Call Shell("cmd /c ren " & Cmd, 0)
         Rename = True
         If BolRenameMe Then
             'soll nur die Datei auf der Festplatte umbenannt werden
             'oder auch dieser Dateiname selber verändert werden
-            Me.Value = ToPFN
+            Me.value = ToPFN
         End If
     End If
     Exit Function
@@ -757,8 +757,8 @@ Public Property Get length() As Long
     If m_FNr Then length = LOF(m_FNr) Else length = FileLen(m_PFN)
 End Property
 
-Public Property Let Pos(ByVal Value As Long)
-    Seek m_FNr, Value
+Public Property Let Pos(ByVal value As Long)
+    Seek m_FNr, value
 End Property
 
 Public Property Get Pos() As Long
@@ -800,16 +800,16 @@ End Property
 
 'Friend Sub New_(aPath As String, Optional FMode As FileMode = FileMode_Random, Optional FAccess As FileAccess = FileAccess_ReadWrite, Optional FShare As FileShare = FileShare_None)
 'Private Function OOpen(ByVal aFMode As FileMode, ByVal aFAccess As FileAccess, ByVal aFShare As FileShare) As Boolean
-Private Function OpenFile(Optional ByVal fm As FileMode = FileMode.FileMode_Random, _
-                          Optional ByVal fa As FileAccess = FileAccess.FileAccess_ReadWrite, _
-                          Optional ByVal fs As FileShare = FileShare.FileShare_None) As Integer
+Public Function OpenFile(Optional ByVal fm As FileMode = FileMode.FileMode_Random, _
+                         Optional ByVal fa As FileAccess = FileAccess.FileAccess_ReadWrite, _
+                         Optional ByVal fs As FileShare = FileShare.FileShare_None) As Integer
 Try: On Error GoTo Catch
     'aFMode = mFMode
     'aFAccess = mFAccess
     'aFShare = mFShare
     If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
     m_FNr = FreeFile
-    Dim pfn As String: pfn = Me.Value
+    Dim pfn As String: pfn = Me.value
     m_FMode = fm
     m_FAccess = fa
     m_FShare = fs
@@ -1076,10 +1076,10 @@ End Function
 Private Function Max(V1, V2)
     If V1 > V2 Then Max = V1 Else Max = V2
 End Function
-Private Sub Let_Drive(ByRef PFN_out As String, ByVal Value As String)
+Private Sub Let_Drive(ByRef PFN_out As String, ByVal value As String)
     'OM TODO: make valid Drive from given Value
-    Value = Trim$(Value)
-    PFN_out = Value & Get_PathOnly(PFN_out) & Get_FileName(PFN_out)
+    value = Trim$(value)
+    PFN_out = value & Get_PathOnly(PFN_out) & Get_FileName(PFN_out)
 End Sub
 
 Private Function Get_PathOnly(PFN_in As String) As String
@@ -1087,10 +1087,10 @@ Private Function Get_PathOnly(PFN_in As String) As String
     Dim p As String: p = Get_Path(PFN_in)
     If Len(p) Then Get_PathOnly = Mid$(p, Len(d) + 1)
 End Function
-Private Sub Let_PathOnly(ByRef PFN_out As String, ByVal Value As String)
+Private Sub Let_PathOnly(ByRef PFN_out As String, ByVal value As String)
     'OM TODO: make valid PathOnly from given Value
-    Value = Trim$(Value)
-    PFN_out = Get_Drive(PFN_out) & Value & Get_FileName(PFN_out)
+    value = Trim$(value)
+    PFN_out = Get_Drive(PFN_out) & value & Get_FileName(PFN_out)
 End Sub
 
 Private Function Get_Path(PFN_in As String) As String
@@ -1110,12 +1110,12 @@ Private Function Get_Path(PFN_in As String) As String
 'Catch:
 '    If Err Then MessError Me, "Path"
 End Function
-Private Sub Let_Path(ByRef PFN_out As String, ByVal Value As String)
+Private Sub Let_Path(ByRef PFN_out As String, ByVal value As String)
     'OM TODO: make valid Drive and Path from given Value
     'does Value contain a Drive Letter?
     'if not add the existing one
-    Value = Trim$(Value)
-    PFN_out = Value & FileName
+    value = Trim$(value)
+    PFN_out = value & FileName
 End Sub
 
 Private Function Get_FileNameOnly(PFN_in As String) As String
@@ -1132,10 +1132,10 @@ Private Function Get_FileNameOnly(PFN_in As String) As String
 'Catch:
 '    If Err Then MessError Me, "FileNameOnly"
 End Function
-Private Sub Let_FileNameOnly(ByRef PFN_out As String, ByVal Value As String)
+Private Sub Let_FileNameOnly(ByRef PFN_out As String, ByVal value As String)
     'ohne Pfad und Extension
-    Value = Trim$(Value)
-    m_PFN = Me.path & Value & Me.Extension
+    value = Trim$(value)
+    m_PFN = Me.Path & value & Me.Extension
 End Sub
 
 Private Function Get_Extension(PFN_in As String) As String
@@ -1145,18 +1145,18 @@ Private Function Get_Extension(PFN_in As String) As String
     If rpt_pos < rbs_pos Then Exit Function
     Get_Extension = Mid$(PFN_in, rpt_pos)
 End Function
-Private Sub Let_Extension(ByRef PFN_out As String, ByVal Value As String)
-    Value = Trim$(Value)
-    If Left(Value, 1) <> "." Then Value = "." & Value
-    m_PFN = Me.path & Me.FileNameOnly & Value
+Private Sub Let_Extension(ByRef PFN_out As String, ByVal value As String)
+    value = Trim$(value)
+    If Left(value, 1) <> "." Then value = "." & value
+    m_PFN = Me.Path & Me.FileNameOnly & value
 End Sub
 
 Private Function Get_FileName(PFN_in As String) As String
     Dim p As String: p = Get_Path(PFN_in)
     Get_FileName = Mid$(PFN_in, Len(p) + 1)
 End Function
-Private Sub Let_FileName(ByRef PFN_out As String, ByVal Value As String)
-    PFN_out = Get_Path(PFN_out) & Value
+Private Sub Let_FileName(ByRef PFN_out As String, ByVal value As String)
+    PFN_out = Get_Path(PFN_out) & value
 End Sub
 
 Private Function Get_DirPart(ByVal n As Long, _
