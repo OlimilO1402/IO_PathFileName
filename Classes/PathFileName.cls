@@ -31,6 +31,9 @@ Attribute VB_Exposed = False
 'resp:
 '      Path (=Drive+OnlyPath)    |  Filename
 '  C:\Windows\System32\          |  user32.dll
+'For this class you will also need the modules:
+'* IO_PathFileName\Modules\MShell.bas
+'* Err_CorrectErrorHandling\Modules\MErr.bas
 
 Option Explicit
 'OM 06.11.2015 13:45; Zeilen:  336
@@ -170,6 +173,13 @@ Private Function New_PathFileName(ByVal aPathFileName As String, _
                          Optional ByVal aExt As String) As PathFileName
     Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
+
+'Copy to MNew.bas
+'Public Function PathFileName(ByVal aPathFileName As String, _
+'                     Optional ByVal aFileName As String, _
+'                     Optional ByVal aExt As String) As PathFileName
+'    Set PathFileName = new PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
+'End Function
 
 ' ^ ############################## ^ '    Constructors      ' ^ ############################## ^ '
 
@@ -555,9 +565,9 @@ End Function
 Public Function PathUp() As PathFileName
     Dim p As String: p = m_PFN
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
-    Dim pos As Long: pos = InStrRev(p, "\")
-    If pos > 0 Then
-        Set PathUp = New_PathFileName(Left(p, pos))
+    Dim Pos As Long: Pos = InStrRev(p, "\")
+    If Pos > 0 Then
+        Set PathUp = New_PathFileName(Left(p, Pos))
     End If
 End Function
 
@@ -753,17 +763,17 @@ CatchE:
     ErrHandler "Rename", ToPFN
 End Function
 
-Public Property Get length() As Long
+Public Property Get Length() As Long
     'Returns the length or size of the file in bytes
-    If m_FNr Then length = LOF(m_FNr) Else length = FileLen(m_PFN)
+    If m_FNr Then Length = LOF(m_FNr) Else Length = FileLen(m_PFN)
 End Property
 
-Public Property Let pos(ByVal Value As Long)
+Public Property Let Pos(ByVal Value As Long)
     Seek m_FNr, Value
 End Property
 
-Public Property Get pos() As Long
-    pos = Seek(m_FNr)
+Public Property Get Pos() As Long
+    Pos = Seek(m_FNr)
 End Property
 'Functions for Writing to and Reading from files
 'Public Function OpenFile(fm As FileMode) As Integer
@@ -1036,6 +1046,13 @@ Public Function ReadLine() As String
     End If
 End Function
 
+Public Function TryReadAllLines(lines_out() As String) As Boolean
+    Dim s As String: s = Me.ReadStr
+    If Len(s) = 0 Then Exit Function
+    lines_out = Split(s, vbCrLf)
+    TryReadAllLines = True
+End Function
+
 Public Sub CloseFile()
     If m_FNr = 0 Then Exit Sub
 Try: On Error GoTo Catch
@@ -1055,21 +1072,21 @@ Private Function Get_Drive(PFN_in As String) As String
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
-    If 0 < pos And pos < 3 Then
-        s = Left$(PFN_in, pos) & "\"
+    Dim pos2 As Long, Pos As Long: Pos = InStr(1, PFN_in, ":")
+    If 0 < Pos And Pos < 3 Then
+        s = Left$(PFN_in, Pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
-        pos = InStr(3, PFN_in, "\")
-        If pos = 0 Then
+        Pos = InStr(3, PFN_in, "\")
+        If Pos = 0 Then
             If Right$(PFN_in, 1) <> "\" Then
                 s = PFN_in & "\"
             End If
-        ElseIf pos > 2 Then
+        ElseIf Pos > 2 Then
             'read to the next "\"
             'pos2 = pos
-            pos2 = InStr(pos + 1, PFN_in, "\")
-            If pos2 > 0 Then pos = Max(pos, pos2)
-            s = Left$(PFN_in, pos)
+            pos2 = InStr(Pos + 1, PFN_in, "\")
+            If pos2 > 0 Then Pos = Max(Pos, pos2)
+            s = Left$(PFN_in, Pos)
         End If
     End If
     Get_Drive = s
@@ -1218,20 +1235,20 @@ Private Function GetValidPath(ByVal aPath As String) As String
 End Function
 Private Function IsValidFileName(aFileName As String) As Boolean
     Dim i As Long
-    Dim x As String: x = "\/:*?""<>|"
+    Dim X As String: X = "\/:*?""<>|"
     If Len(aFileName) Then
-        For i = 1 To Len(x)
-            IsValidFileName = (InStr(1, aFileName, Mid$(x, i, 1)) <> 0)
+        For i = 1 To Len(X)
+            IsValidFileName = (InStr(1, aFileName, Mid$(X, i, 1)) <> 0)
             If Not IsValidFileName Then Exit Function
         Next
     End If
 End Function
 Private Function GetValidFileName(aFileName As String) As String
     Dim i As Long
-    Dim c As String, x As String: x = "\/:" & C_InvalidChars '*?""<>|"
+    Dim c As String, X As String: X = "\/:" & C_InvalidChars '*?""<>|"
     If Len(aFileName) Then
         'GetValidFileName = aFileName
-        GetValidFileName = RemoveChars(aFileName, x)
+        GetValidFileName = RemoveChars(aFileName, X)
         'For i = 1 To Len(x)
         '    c = Mid$(x, i, 1)
         '    GetValidFileName = Replace$(GetValidFileName, c, vbNullString)
@@ -1285,22 +1302,22 @@ Try: On Error GoTo Catch
     If p <> 0 Then aStrPath = Left$(aStrPath, p - 1)
     'und alle Zeichen entfernen die nicht hinein dürfen
     Dim i As Long
-    Dim c As String, x As String: x = C_InvalidChars '"*?""<>|"
+    Dim c As String, X As String: X = C_InvalidChars '"*?""<>|"
     Select Case C_DirSepChar
-    Case 92: x = x & "/"
-    Case 47: x = x & "\"
+    Case 92: X = X & "/"
+    Case 47: X = X & "\"
     End Select
-    aStrPath = RemoveChars(aStrPath, x)
+    aStrPath = RemoveChars(aStrPath, X)
     aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
     c = Chr$(C_DirSepChar)
-    x = c & c
+    X = c & c
     Dim posDblBackSlash As Long
-    posDblBackSlash = InStr(1, aStrPath, x)
+    posDblBackSlash = InStr(1, aStrPath, X)
     If posDblBackSlash > 1 Then
-        aStrPath = Replace(aStrPath, x, c)
+        aStrPath = Replace(aStrPath, X, c)
     End If
     'und doppelpunkte ":" entfernen ausser in der Laufwerksangabe
     Dim sd As String: sd = Get_Drive(aStrPath)
