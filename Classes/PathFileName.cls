@@ -48,6 +48,8 @@ Option Explicit
         ByVal nShowCmd As Long) As Long
     'creates a complete directory of arbitrary depth:
     Private Declare PtrSafe Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
+    Private Declare PtrSafe Function GetFileAttributesW Lib "kernel32" (ByVal lpFileName As LongPtr) As Long
+    Private Declare PtrSafe Function SetFileAttributesW Lib "kernel32" (ByVal lpFileName As LongPtr, ByVal Value As Long) As Long
 #Else
     'activate the Enum LongPtr if you do not want to declare it in another module, maybe because this is the only class you use
     Private Enum LongPtr
@@ -62,7 +64,32 @@ Option Explicit
         ByVal nShowCmd As Long) As Long
     'erzeugt eine komplette Verzeichnisstruktur beliebiger Tiefe:
     Private Declare Function MakeSureDirectoryPathExists Lib "imagehlp" (ByVal lpPath As LongPtr) As Long
+    Private Declare Function GetFileAttributesW Lib "kernel32" (ByVal lpFileName As LongPtr) As Long
+    Private Declare Function SetFileAttributesW Lib "kernel32" (ByVal lpFileName As LongPtr, ByVal Value As Long) As Long
 #End If
+
+Enum EFileAttribute
+    None = VbFileAttribute.vbNormal         '         0
+    ReadOnly = VbFileAttribute.vbReadOnly   '         1 Die Datei ist schreibgeschützt. ReadOnly wird unter Windows, Linux und macOS unterstützt. Unter Linux und macOS ist das Ändern des ReadOnly-Flags ein Vorgang mit Berechtigungen.
+    Hidden = VbFileAttribute.vbHidden       '         2 Die Datei ist versteckt und daher nicht in einer normalen Verzeichnisliste enthalten. Hidden wird unter Windows, Linux und macOS unterstützt.
+    System = VbFileAttribute.vbSystem       '         4 Die Datei ist eine Systemdatei. Die Datei ist also Teil des Betriebssystems oder wird ausschließlich durch das Betriebssystem verwendet.
+    Volume = VbFileAttribute.vbVolume       '         8  '???
+    Directory = VbFileAttribute.vbDirectory '&H10 =  16 Die Datei ist ein Verzeichnis. Directory wird unter Windows, Linux und macOS unterstützt.
+    Archive = VbFileAttribute.vbArchive     '&H20 =  32 Diese Datei ist für das Einbeziehen beim inkrementellen Sicherungsvorgang markiert. Dieses Attribut wird von Windows festgelegt, sobald die
+                                            '           Datei geändert wird, und die Sicherungssoftware sollte es beim Verarbeiten der Datei während der inkrementellen Sicherung löschen.
+    Device = VbFileAttribute.vbAlias        '&H40 =  64 Für zukünftige Verwendung reserviert.
+    Normal = &H80&                          '&H80 = 128 Die Datei ist eine Standarddatei, die über keine speziellen Attribute verfügt. Dieses Attribut ist nur gültig, wenn es allein verwendet wird.
+                                            '           Normal wird unter Windows, Linux und macOS unterstützt.
+    Temporary = &H100&                      '       256 Die Datei ist temporär. Eine temporäre Datei enthält Daten, die benötigt werden, während eine Anwendung ausgeführt wird, die aber nicht benötigt wird, nachdem die Anwendung beendet ist. Dateisysteme versuchen, für einen schnelleren Zugriff alle Daten im Speicher zu behalten, anstatt diese zurück in den Massenspeicher zu entleeren. Eine temporäre Datei sollte von der Anwendung gelöscht werden, sobald sie nicht mehr benötigt wird.
+    SparseFile = &H200&                     '       512 Die Datei ist eine Datei mit geringer Dichte. Dünn besetzte Dateien sind normalerweise große Dateien, deren Daten hauptsächlich aus Nullen bestehen.
+    ReparsePoint = &H400&                   '      1024 Die Datei enthält einen Analysepunkt. Dies ist ein Block mit benutzerdefinierten Daten, die mit einer Datei oder einem Verzeichnis verknüpft sind. ReparsePoint wird unter Windows, Linux und macOS unterstützt.
+    Compressed = &H800&                     '      2048 Die Datei ist komprimiert.
+    Offline = &H1000&                       '      4096 Die Datei ist eine Offlinedatei. Die Daten der Datei sind nicht sofort verfügbar.
+    NotContentIndexed = &H2000&             '      8192 Die Datei wird nicht vom Inhaltsindexdienst des Betriebssystems indiziert.
+    Encrypted = &H4000&                     '     16384 Die Datei oder das Verzeichnis ist verschlüsselt. Bei einer Datei bedeutet dies, dass alle Daten in der Datei verschlüsselt sind. Bei einem Verzeichnis bedeutet dies, dass neu erstellte Dateien und Verzeichnisse standardmäßig verschlüsselt werden.
+    IntegrityStream = &H8000&               '     32768 Die Datei oder das Verzeichnis enthält die Datenintegritätsunterstützung. Wenn dieser Wert auf eine Datei angewendet wird, haben alle Datenstreams in der Datei Integritätsunterstützung. Wenn dieser Wert auf ein Verzeichnis angewendet wird, erhalten alle neuen Dateien und Unterverzeichnisse innerhalb dieses Verzeichnisses standardmäßig Integritätsunterstützung.
+    NoScrubData = &H20000                   '    131072 Die Datei oder das Verzeichnis ist von der Datenintegritätsüberprüfung ausgeschlossen. Wenn dieser Wert standardmäßig auf ein Verzeichnis angewendet wird, werden alle neuen Dateien und Unterverzeichnisse innerhalb dieses Verzeichnisses aus der Datenintegrität ausgeschlossen.
+End Enum
 
 
 'old
@@ -184,6 +211,52 @@ End Function
 ' ^ ############################## ^ '    Constructors      ' ^ ############################## ^ '
 
 ' v ############################## v '  Public Properties   ' v ############################## v '
+Public Property Get AttributesX() As EFileAttribute
+     AttributesX = GetFileAttributesW(StrPtr(m_PFN))
+End Property
+Public Property Let AttributesX(ByVal Value As EFileAttribute)
+     SetFileAttributesW StrPtr(m_PFN), Value
+End Property
+
+Public Function AttributesToStr() As String
+    Dim e As EFileAttribute: e = Me.AttributesX
+    Dim s As String ': s = ""
+    If e = EFileAttribute.None Then s = "None"
+    If e And EFileAttribute.ReadOnly Then _
+        s = s & IIf(Len(s), " ", "") & "ReadOnly"
+    If e And EFileAttribute.Hidden Then _
+        s = s & IIf(Len(s), " ", "") & "Hidden"
+    If e And EFileAttribute.Volume Then _
+        s = s & IIf(Len(s), " ", "") & "Volume"
+    If e And EFileAttribute.Directory Then _
+        s = s & IIf(Len(s), " ", "") & "Directory"
+    If e And EFileAttribute.Archive Then _
+        s = s & IIf(Len(s), " ", "") & "Archive"
+    If e And EFileAttribute.Device Then _
+        s = s & IIf(Len(s), " ", "") & "Device"
+    If e And EFileAttribute.Normal Then _
+        s = s & IIf(Len(s), " ", "") & "Normal"
+    If e And EFileAttribute.Temporary Then _
+        s = s & IIf(Len(s), " ", "") & "Temporary"
+    If e And EFileAttribute.SparseFile Then _
+        s = s & IIf(Len(s), " ", "") & "SparseFile"
+    If e And EFileAttribute.ReparsePoint Then _
+        s = s & IIf(Len(s), " ", "") & "ReparsePoint"
+    If e And EFileAttribute.Compressed Then _
+        s = s & IIf(Len(s), " ", "") & "Compressed"
+    If e And EFileAttribute.Offline Then _
+        s = s & IIf(Len(s), " ", "") & "Offline"
+    If e And EFileAttribute.NotContentIndexed Then _
+        s = s & IIf(Len(s), " ", "") & "NotContentIndexed"
+    If e And EFileAttribute.Encrypted Then _
+        s = s & IIf(Len(s), " ", "") & "Encrypted"
+    If e And EFileAttribute.IntegrityStream Then _
+        s = s & IIf(Len(s), " ", "") & "IntegrityStream"
+    If e And EFileAttribute.NoScrubData Then _
+        s = s & IIf(Len(s), " ", "") & "NoScrubData"
+    AttributesToStr = s
+End Function
+
 Public Property Get Value() As String
     Value = m_PFN
 End Property
