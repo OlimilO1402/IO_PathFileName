@@ -638,9 +638,9 @@ End Function
 Public Function PathUp() As PathFileName
     Dim p As String: p = m_PFN
     If Right(p, 1) = "\" Then p = Left(p, Len(p) - 1)
-    Dim Pos As Long: Pos = InStrRev(p, "\")
-    If Pos > 0 Then
-        Set PathUp = New_PathFileName(Left(p, Pos))
+    Dim pos As Long: pos = InStrRev(p, "\")
+    If pos > 0 Then
+        Set PathUp = New_PathFileName(Left(p, pos))
     End If
 End Function
 
@@ -841,12 +841,12 @@ Public Property Get Length() As Long
     If m_FNr Then Length = LOF(m_FNr) Else Length = FileLen(m_PFN)
 End Property
 
-Public Property Let Pos(ByVal Value As Long)
+Public Property Let pos(ByVal Value As Long)
     Seek m_FNr, Value
 End Property
 
-Public Property Get Pos() As Long
-    Pos = Seek(m_FNr)
+Public Property Get pos() As Long
+    pos = Seek(m_FNr)
 End Property
 'Functions for Writing to and Reading from files
 'Public Function OpenFile(fm As FileMode) As Integer
@@ -1080,7 +1080,7 @@ Catch:
     MsgBox "Error: " & CStr(Err.Number) & " in PFNStream::OOpen: " & Err.Description
 End Function
 
-Public Sub WriteStr(aStr As String)
+Public Function WriteStr(aStr As String) As Boolean
 Try: On Error GoTo Catch
     If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Write
     Select Case m_FMode
@@ -1089,10 +1089,11 @@ Try: On Error GoTo Catch
     Case FileMode.FileMode_Output
         Write #m_FNr, aStr
     End Select
-    Exit Sub
+    WriteStr = True
+    Exit Function
 Catch:
     ErrHandler "WriteStr", m_PFN
-End Sub
+End Function
 
 Public Function ReadStr() As String
 Try: On Error GoTo Catch
@@ -1145,21 +1146,21 @@ Private Function Get_Drive(PFN_in As String) As String
     'and yes, a linked network drive will be treated here as a local drive
     'it will always be closed by "\"
     Dim s As String
-    Dim pos2 As Long, Pos As Long: Pos = InStr(1, PFN_in, ":")
-    If 0 < Pos And Pos < 3 Then
-        s = Left$(PFN_in, Pos) & "\"
+    Dim pos2 As Long, pos As Long: pos = InStr(1, PFN_in, ":")
+    If 0 < pos And pos < 3 Then
+        s = Left$(PFN_in, pos) & "\"
     ElseIf Left$(PFN_in, 2) = "\\" Then
-        Pos = InStr(3, PFN_in, "\")
-        If Pos = 0 Then
+        pos = InStr(3, PFN_in, "\")
+        If pos = 0 Then
             If Right$(PFN_in, 1) <> "\" Then
                 s = PFN_in & "\"
             End If
-        ElseIf Pos > 2 Then
+        ElseIf pos > 2 Then
             'read to the next "\"
             'pos2 = pos
-            pos2 = InStr(Pos + 1, PFN_in, "\")
-            If pos2 > 0 Then Pos = Max(Pos, pos2)
-            s = Left$(PFN_in, Pos)
+            pos2 = InStr(pos + 1, PFN_in, "\")
+            If pos2 > 0 Then pos = Max(pos, pos2)
+            s = Left$(PFN_in, pos)
         End If
     End If
     Get_Drive = s
