@@ -1084,6 +1084,10 @@ Public Function WriteStr(aStr As String) As Boolean
 Try: On Error GoTo Catch
     If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Write
     Select Case m_FMode
+    Case FileMode.FileMode_Append
+        'mit Put Err54 falscher Dateimodus
+        'Write #m_FNr, aStr
+        Print #m_FNr, aStr
     Case FileMode.FileMode_Binary
         Put #m_FNr, , aStr
     Case FileMode.FileMode_Output
@@ -1309,20 +1313,20 @@ Private Function GetValidPath(ByVal aPath As String) As String
 End Function
 Private Function IsValidFileName(aFileName As String) As Boolean
     Dim i As Long
-    Dim X As String: X = "\/:*?""<>|"
+    Dim x As String: x = "\/:*?""<>|"
     If Len(aFileName) Then
-        For i = 1 To Len(X)
-            IsValidFileName = (InStr(1, aFileName, Mid$(X, i, 1)) <> 0)
+        For i = 1 To Len(x)
+            IsValidFileName = (InStr(1, aFileName, Mid$(x, i, 1)) <> 0)
             If Not IsValidFileName Then Exit Function
         Next
     End If
 End Function
 Private Function GetValidFileName(aFileName As String) As String
     Dim i As Long
-    Dim c As String, X As String: X = "\/:" & C_InvalidChars '*?""<>|"
+    Dim c As String, x As String: x = "\/:" & C_InvalidChars '*?""<>|"
     If Len(aFileName) Then
         'GetValidFileName = aFileName
-        GetValidFileName = RemoveChars(aFileName, X)
+        GetValidFileName = RemoveChars(aFileName, x)
         'For i = 1 To Len(x)
         '    c = Mid$(x, i, 1)
         '    GetValidFileName = Replace$(GetValidFileName, c, vbNullString)
@@ -1376,22 +1380,22 @@ Try: On Error GoTo Catch
     If p <> 0 Then aStrPath = Left$(aStrPath, p - 1)
     'und alle Zeichen entfernen die nicht hinein dürfen
     Dim i As Long
-    Dim c As String, X As String: X = C_InvalidChars '"*?""<>|"
+    Dim c As String, x As String: x = C_InvalidChars '"*?""<>|"
     Select Case C_DirSepChar
-    Case 92: X = X & "/"
-    Case 47: X = X & "\"
+    Case 92: x = x & "/"
+    Case 47: x = x & "\"
     End Select
-    aStrPath = RemoveChars(aStrPath, X)
+    aStrPath = RemoveChars(aStrPath, x)
     aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
     c = Chr$(C_DirSepChar)
-    X = c & c
+    x = c & c
     Dim posDblBackSlash As Long
-    posDblBackSlash = InStr(1, aStrPath, X)
+    posDblBackSlash = InStr(1, aStrPath, x)
     If posDblBackSlash > 1 Then
-        aStrPath = Replace(aStrPath, X, c)
+        aStrPath = Replace(aStrPath, x, c)
     End If
     'und doppelpunkte ":" entfernen ausser in der Laufwerksangabe
     Dim sd As String: sd = Get_Drive(aStrPath)
