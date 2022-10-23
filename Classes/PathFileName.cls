@@ -200,8 +200,7 @@ Private Function New_PathFileName(ByVal aPathFileName As String, _
                          Optional ByVal aExt As String) As PathFileName
     Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
-
-'Copy to MNew.bas
+'Copy to MNew:
 'Public Function PathFileName(ByVal aPathFileName As String, _
 '                     Optional ByVal aFileName As String, _
 '                     Optional ByVal aExt As String) As PathFileName
