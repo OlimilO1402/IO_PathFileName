@@ -52,9 +52,9 @@ Option Explicit
     Private Declare PtrSafe Function SetFileAttributesW Lib "kernel32" (ByVal lpFileName As LongPtr, ByVal Value As Long) As Long
 #Else
     'activate the Enum LongPtr if you do not want to declare it in another module, maybe because this is the only class you use
-    Private Enum LongPtr
-        [_]
-    End Enum
+    'Private Enum LongPtr
+    '    [_]
+    'End Enum
     Private Declare Function ShellExecuteW Lib "Shell32" ( _
         ByVal hwnd As LongPtr, _
         ByVal lpOperation As LongPtr, _
@@ -407,6 +407,19 @@ End Property
 Public Property Get IsEOF() As Boolean
     IsEOF = EOF(m_FNr)
 End Property
+
+Public Property Get HasBOM() As Boolean
+    Dim i As Integer: i = Me.ReadInt
+    HasBOM = i = &HFFFE Or i = &HFEFF
+    'If i = &H5B Then
+    '    FileIsUnicode = True
+    'If i = &HFFFE Or i = &HFEFF Then
+    '    i = m_PFN.ReadInt
+    '    'If i = &H5B00 Then FileIsUnicode = True
+    'End If
+    'm_PFN.CloseFile
+End Property
+
 ' ^ ####################### ^ ' Public ReadOnly Boolean Properties ' ^ ####################### ^ '
 
 ' v ############################## v '   Public Functions   ' v ############################## v '
@@ -897,7 +910,7 @@ Try: On Error GoTo Catch
     'aFShare = mFShare
     If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
     m_FNr = FreeFile
-    Dim PFN As String: PFN = Me.Value
+    Dim pfn As String: pfn = Me.Value
     m_FMode = fm
     m_FAccess = fa
     m_FShare = fs
@@ -906,11 +919,11 @@ Try: On Error GoTo Catch
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Append As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Append Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Append Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Append Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Append Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Shared As m_FNr
             End Select
         'Case FileAccess.FileAccess_Read 'Not Possible
         '    Select Case aFShare
@@ -922,73 +935,73 @@ Try: On Error GoTo Catch
         '    End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Append Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Append Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Append Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Append Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Append Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Append Access Read Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Append Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Append Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Append Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Append Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Append Access Read Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Append Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Append Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Append Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Append Access Read Write Shared As m_FNr
             End Select
         End Select
     Case FileMode.FileMode_Binary
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Binary As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Binary Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Binary Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Binary Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Binary Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Binary Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Binary Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Binary Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Binary Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Binary Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Read Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Binary Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Binary Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Binary Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Binary Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Binary Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Binary Access Read Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Binary Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Binary Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Binary Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Binary Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Binary Access Read Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Binary Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Binary Access Read Write Shared As m_FNr
             End Select
         End Select
     Case FileMode.FileMode_Input
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Input As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Input Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Input Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Input Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Input Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Input As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Input Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Input Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Input Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Input Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Input Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Input Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Input Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Input Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Input Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Input Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Input Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Input Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Input Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Input Access Read Shared As m_FNr
             End Select
         'Case FileAccess_Write 'Not Possible
         '    Select Case fs
@@ -1011,11 +1024,11 @@ Try: On Error GoTo Catch
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Output As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Output Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Output Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Output Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Output Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Output As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Output Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Output Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Output Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Output Shared As m_FNr
             End Select
 '        Case FileAccess_Read
 '            Select Case fs 'Not Possible
@@ -1027,11 +1040,11 @@ Try: On Error GoTo Catch
 '            End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Output Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Output Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Output Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Output Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Output Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Output Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Output Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Output Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Output Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Output Access Write Shared As m_FNr
             End Select
             '    Case FileAccess_ReadWrite
             '      Select Case fs 'Not Possible
@@ -1046,35 +1059,35 @@ Try: On Error GoTo Catch
         Select Case fa
         Case FileAccess.FileAccess_None
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Random As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Random Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Random Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Random Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Random Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Read
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Random Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Random Access Read Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Random Access Read Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Random Access Read Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Random Access Read Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Read Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Read Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Read Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_Write
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Random Access Write As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Random Access Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Random Access Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Random Access Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Random Access Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Write As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Write Shared As m_FNr
             End Select
         Case FileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case FileShare.FileShare_None:          Open PFN For Random Access Read As m_FNr
-            Case FileShare.FileShare_LockRead:      Open PFN For Random Access Read Write Lock Read As m_FNr
-            Case FileShare.FileShare_LockWrite:     Open PFN For Random Access Read Write Lock Write As m_FNr
-            Case FileShare.FileShare_LockReadWrite: Open PFN For Random Access Read Write Lock Read Write As m_FNr
-            Case FileShare.FileShare_Shared:        Open PFN For Random Access Read Write Shared As m_FNr
+            Case FileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
+            Case FileShare.FileShare_LockRead:      Open pfn For Random Access Read Write Lock Read As m_FNr
+            Case FileShare.FileShare_LockWrite:     Open pfn For Random Access Read Write Lock Write As m_FNr
+            Case FileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Write Lock Read Write As m_FNr
+            Case FileShare.FileShare_Shared:        Open pfn For Random Access Read Write Shared As m_FNr
             End Select
         End Select
     End Select
@@ -1084,23 +1097,49 @@ Catch:
     MsgBox "Error: " & CStr(Err.Number) & " in PFNStream::OOpen: " & Err.Description
 End Function
 
-Public Function WriteStr(aStr As String) As Boolean
+Public Function ReadAllStr() As String
 Try: On Error GoTo Catch
-    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Write
+    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Read ' fmBinary_Read
+    Dim aStr As String
     Select Case m_FMode
-    Case FileMode.FileMode_Append
-        'mit Put Err54 falscher Dateimodus
-        'Write #m_FNr, aStr
-        Print #m_FNr, aStr
-    Case FileMode.FileMode_Binary
-        Put #m_FNr, , aStr
-    Case FileMode.FileMode_Output
-        Write #m_FNr, aStr
+    Case FileMode.FileMode_Binary 'fmBinary_Read
+        aStr = Space(LOF(m_FNr))
+        Get #m_FNr, , aStr
+    Case FileMode.FileMode_Input 'fmText_Read
+        Input #m_FNr, aStr
     End Select
-    WriteStr = True
+    ReadAllStr = aStr
     Exit Function
 Catch:
-    ErrHandler "WriteStr", m_PFN
+    ErrHandler "ReadAllStr", m_PFN
+End Function
+
+Public Function ReadAllStrW() As String
+Try: On Error GoTo Catch
+    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Read ' fmBinary_Read
+    Dim aStr() As Byte
+    Select Case m_FMode
+    Case FileMode.FileMode_Binary 'fmBinary_Read
+        ReDim aStr(0 To LOF(m_FNr))
+        Get #m_FNr, , aStr
+    Case FileMode.FileMode_Input 'fmText_Read
+        Input #m_FNr, aStr
+    End Select
+    ReadAllStrW = aStr
+    Exit Function
+Catch:
+    ErrHandler "ReadAllStr", m_PFN
+End Function
+
+Public Function ReadLine() As String
+    If m_FNr = 0 Then
+        Me.OpenFile FileMode_Input, FileAccess_Read
+    End If
+    If m_FMode = FileMode.FileMode_Input Then
+        Line Input #m_FNr, ReadLine
+    Else
+        'wenn binary dann bis zum, nächsten vbcr, vblf oder vbcrlf lesen
+    End If
 End Function
 
 Public Function WriteLine(aLine As String) As Boolean
@@ -1117,36 +1156,23 @@ Try: On Error GoTo Catch
 Catch:
 End Function
 
-Public Function ReadStr() As String
+Public Function WriteLineW(ByVal aLine As String) As Boolean
 Try: On Error GoTo Catch
-    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Read ' fmBinary_Read
-    Dim aStr As String
-    Select Case m_FMode
-    Case FileMode.FileMode_Binary 'fmBinary_Read
-        aStr = Space(LOF(m_FNr))
-        Get #m_FNr, , aStr
-    Case FileMode.FileMode_Input 'fmText_Read
-        Input #m_FNr, aStr
-    End Select
-    ReadStr = aStr
-    Exit Function
-Catch:
-    ErrHandler "ReadStr", m_PFN
-End Function
-
-Public Function ReadLine() As String
     If m_FNr = 0 Then
-        Me.OpenFile FileMode_Input, FileAccess_Read
+        Me.OpenFile FileMode.FileMode_Binary, FileAccess.FileAccess_Write
     End If
-    If m_FMode = FileMode.FileMode_Input Then
-        Line Input #m_FNr, ReadLine
+    If m_FMode = FileMode.FileMode_Binary Then
+        Dim buffer() As Byte: buffer = aLine & vbCrLf
+        'Write #m_FNr, aLine & vbCrLf
+        Put #m_FNr, , buffer
     Else
-        'wenn binary dann bis zum, nächsten vbcr, vblf oder vbcrlf lesen
+        'works only with FileMode_Binary
     End If
+Catch:
 End Function
 
 Public Function TryReadAllLines(lines_out() As String) As Boolean
-    Dim s As String: s = Me.ReadStr
+    Dim s As String: s = Me.ReadAllStr
     If Len(s) = 0 Then Exit Function
     lines_out = Split(s, vbCrLf)
     TryReadAllLines = True
@@ -1169,6 +1195,15 @@ End Function
 Public Sub WriteByt(ByVal Value As Byte)
     If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
+End Sub
+
+Public Function ReadChrW() As Integer
+    If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
+    Get m_FNr, , ReadChrW
+End Function
+Public Sub WriteChrW(ByVal aCharW As Integer)
+    If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
+    Put m_FNr, , aCharW
 End Sub
 
 Public Function ReadInt() As Integer
@@ -1234,27 +1269,62 @@ Public Sub WriteVar(ByVal Value As Variant)
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadStrLen(ByVal BytLen As Long) As String
-    ReadStrLen = String$(BytLen, vbNullChar)
+Public Function ReadStr(ByVal BytLen As Long) As String
+    'Reads Ansi String
+    ReadStr = String$(BytLen, vbNullChar)
     If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadStrLen
+    Get m_FNr, , ReadStr
 End Function
-'Public Sub WriteStrLen(ByVal BytLen As Long, ByVal Value As String)
+'Public Sub WriteStr(ByVal Value As String)
 '    If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
 '    Put m_FNr, , Value
 'End Sub
 
-Public Sub ReadMem(ByVal pDst As LongPtr, ByVal BytLen As Long)
-    ReDim Buffer(0 To BytLen) As Byte
+Public Function WriteStr(Value As String) As Boolean
+    'Writes Ansi String
+Try: On Error GoTo Catch
+    If m_FNr = 0 Then OpenFile FileMode.FileMode_Binary ', FileAccess.FileAccess_Write
+    Select Case m_FMode
+    Case FileMode.FileMode_Append
+        'mit Put Err54 falscher Dateimodus
+        'Write #m_FNr, aStr
+        Print #m_FNr, Value
+    Case FileMode.FileMode_Binary
+        Put #m_FNr, , Value
+    Case FileMode.FileMode_Output
+        Write #m_FNr, Value
+    End Select
+    WriteStr = True
+    Exit Function
+Catch:
+    ErrHandler "WriteStr", m_PFN
+End Function
+
+Public Function ReadStrW(ByVal BytLen As Long) As String
+    'Reads WideChar String
+    ReDim buffer(BytLen) As Byte
     If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , Buffer
-    RtlMoveMemory ByVal pDst, Buffer(0), BytLen
+    Get m_FNr, , buffer
+    ReadStrW = buffer
+End Function
+Public Sub WriteStrW(ByVal Value As String)
+    'Writes WideChar String
+    If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
+    Dim buffer() As Byte: buffer = Value
+    Put m_FNr, , buffer
+End Sub
+
+Public Sub ReadMem(ByVal pDst As LongPtr, ByVal BytLen As Long)
+    ReDim buffer(0 To BytLen) As Byte
+    If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
+    Get m_FNr, , buffer
+    RtlMoveMemory ByVal pDst, buffer(0), BytLen
 End Sub
 Public Sub WriteMem(ByVal pSrc As LongPtr, ByVal BytLen As Long)
-    ReDim Buffer(0 To BytLen) As Byte
-    RtlMoveMemory Buffer(0), ByVal pSrc, BytLen
+    ReDim buffer(0 To BytLen) As Byte
+    RtlMoveMemory buffer(0), ByVal pSrc, BytLen
     If m_FNr = 0 Then OpenFile FileMode_Binary, FileAccess_ReadWrite
-    Put m_FNr, , Buffer
+    Put m_FNr, , buffer
 End Sub
 
 ' ^ ############################## ^ '   Public Functions   ' ^ ############################## ^ '
@@ -1430,20 +1500,20 @@ Private Function GetValidPath(ByVal aPath As String) As String
 End Function
 Private Function IsValidFileName(aFileName As String) As Boolean
     Dim i As Long
-    Dim x As String: x = "\/:*?""<>|"
+    Dim X As String: X = "\/:*?""<>|"
     If Len(aFileName) Then
-        For i = 1 To Len(x)
-            IsValidFileName = (InStr(1, aFileName, Mid$(x, i, 1)) <> 0)
+        For i = 1 To Len(X)
+            IsValidFileName = (InStr(1, aFileName, Mid$(X, i, 1)) <> 0)
             If Not IsValidFileName Then Exit Function
         Next
     End If
 End Function
 Private Function GetValidFileName(aFileName As String) As String
     Dim i As Long
-    Dim c As String, x As String: x = "\/:" & C_InvalidChars '*?""<>|"
+    Dim c As String, X As String: X = "\/:" & C_InvalidChars '*?""<>|"
     If Len(aFileName) Then
         'GetValidFileName = aFileName
-        GetValidFileName = RemoveChars(aFileName, x)
+        GetValidFileName = RemoveChars(aFileName, X)
         'For i = 1 To Len(x)
         '    c = Mid$(x, i, 1)
         '    GetValidFileName = Replace$(GetValidFileName, c, vbNullString)
@@ -1497,22 +1567,22 @@ Try: On Error GoTo Catch
     If p <> 0 Then aStrPath = Left$(aStrPath, p - 1)
     'und alle Zeichen entfernen die nicht hinein dürfen
     Dim i As Long
-    Dim c As String, x As String: x = C_InvalidChars '"*?""<>|"
+    Dim c As String, X As String: X = C_InvalidChars '"*?""<>|"
     Select Case C_DirSepChar
-    Case 92: x = x & "/"
-    Case 47: x = x & "\"
+    Case 92: X = X & "/"
+    Case 47: X = X & "\"
     End Select
-    aStrPath = RemoveChars(aStrPath, x)
+    aStrPath = RemoveChars(aStrPath, X)
     aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
     c = Chr$(C_DirSepChar)
-    x = c & c
+    X = c & c
     Dim posDblBackSlash As Long
-    posDblBackSlash = InStr(1, aStrPath, x)
+    posDblBackSlash = InStr(1, aStrPath, X)
     If posDblBackSlash > 1 Then
-        aStrPath = Replace(aStrPath, x, c)
+        aStrPath = Replace(aStrPath, X, c)
     End If
     'und doppelpunkte ":" entfernen ausser in der Laufwerksangabe
     Dim sd As String: sd = Get_Drive(aStrPath)
