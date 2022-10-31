@@ -1148,8 +1148,7 @@ Try: On Error GoTo Catch
         Me.OpenFile FileMode.FileMode_Output, FileAccess.FileAccess_Write
     End If
     If m_FMode = FileMode.FileMode_Output Then
-        'Write #m_FNr, aLine & vbCrLf
-        Print #m_FNr, aLine & vbCrLf
+        Print #m_FNr, aLine
     Else
         'wenn binary dann bis zum, nächsten vbcr, vblf oder vbcrlf lesen
     End If
