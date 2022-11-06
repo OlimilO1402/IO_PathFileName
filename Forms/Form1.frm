@@ -28,7 +28,7 @@ Begin VB.Form Form1
       Width           =   1815
    End
    Begin VB.CommandButton BtnTestUnicode 
-      Caption         =   "TestUnicode"
+      Caption         =   "TestUnicode >>"
       BeginProperty Font 
          Name            =   "Tahoma"
          Size            =   9
@@ -907,18 +907,7 @@ Private Sub BtnCreatePathFileName_Click()
 End Sub
 
 Private Sub BtnTestUnicode_Click()
-    Dim OFD As New OpenFileDialog
-    If OFD.ShowDialog(Me) = vbCancel Then Exit Sub
-    Dim f As String: f = OFD.FileName
-    Debug.Print f
-    Dim pfn As PathFileName: Set pfn = MNew.PathFileName(f)
-Try: On Error GoTo Catch
-    Dim FNr As Integer: FNr = pfn.OpenFile(FileMode_Binary, FileAccess_Read)
-    ReDim Buffer(0 To pfn.Length)
-    Get FNr, , Buffer
-    'GoTo Finally
-Catch:
-    MsgBox "Mist"
+    Form2.Show
 End Sub
 
 Private Sub BtnFileAttributes_Click()
