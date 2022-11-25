@@ -1,0 +1,16 @@
+﻿Däs üst öin lÄnger TÄxt hüer ön där DÄtei müt vÜlen kömischen BÖchstaben.
+Däs üst öin lÄnger TÄxt hüer ön där DÄtei müt vÜlen kömischen BÖchstaben.
+Däs üst öin lÄnger TÄxt hüer ön där DÄtei müt vÜlen kömischen BÖchstaben.
+Däs üst öin lÄnger TÄxt hüer ön där DÄtei müt vÜlen kömischen BÖchstaben.
+Däs üst öin lÄnger TÄxt hüer ön där DÄtei müt vÜlen kömischen BÖchstaben.
+Also wenn Du in Deutschland lebst, bzw auf deinem PC für nicht-unicodefähige 
+Programme die deutsche Sprache eingestellt wurde und Du in dem Text oben 
+viele ÄäÖöÜü lesen kannst, dann ist das ein untrügliches Zeichen dafür dass 
+die Datei sehr wahrscheinlich richtig eingelesen wurde. 
+Diese Datei wurde UTF-8-BOM encodiert. 
+D.h. am Anfang der Datei befindet sich ein BOM = ByteOrderMark
+
+siehe z.B.
+https://de.wikipedia.org/wiki/Byte_Order_Mark
+
+https://en.wikipedia.org/wiki/Byte_order_mark

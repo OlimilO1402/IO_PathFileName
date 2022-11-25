@@ -907,7 +907,7 @@ Private Sub BtnCreatePathFileName_Click()
 End Sub
 
 Private Sub BtnTestUnicode_Click()
-    Form2.Show
+    Form2.Show vbModal, Me
 End Sub
 
 Private Sub BtnFileAttributes_Click()

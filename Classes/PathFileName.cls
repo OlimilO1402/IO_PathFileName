@@ -1115,22 +1115,38 @@ Try: On Error GoTo Catch
     If m_FNr = 0 Then Exit Function
     Dim bom As EByteOrderMark: bom = ReadBOM
     Dim s As String
-    Dim buffer() As Byte
+    Dim Buffer() As Byte
     Select Case m_FMode
     Case EFileMode.FileMode_Binary
         Select Case bom
         Case EByteOrderMark.bom_UTF_16_LE
-            ReDim buffer(0 To LOF(m_FNr) - Me.pos + 1)
-            Get m_FNr, , buffer
-            ReadAllText = buffer
+            ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
+            Get m_FNr, , Buffer
+            ReadAllText = Buffer
+        Case EByteOrderMark.bom_UTF_16_BE
+            ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
+            Get m_FNr, , Buffer
+            ReadAllText = Buffer
+            MPtr.String_Rotate2 ReadAllText
         Case EByteOrderMark.bom_UTF_32_LE
             s = Space(LOF(m_FNr) - Me.pos + 1)
             Get m_FNr, , s
             ReadAllText = StrConv(s, vbFromUnicode)
+        Case EByteOrderMark.bom_UTF_32_BE
+            s = Space(LOF(m_FNr) - Me.pos + 1)
+            Get m_FNr, , s
+            ReadAllText = StrConv(s, vbFromUnicode)
+            MPtr.String_Rotate2 ReadAllText
         Case EByteOrderMark.bom_UTF_7
-            ReDim buffer(0 To LOF(m_FNr) - Me.pos + 1)
-            Get m_FNr, , buffer
-            ReadAllText = buffer
+            ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
+            Get m_FNr, , Buffer
+            ReadAllText = Buffer
+        Case EByteOrderMark.bom_UTF_8
+            ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
+            Get m_FNr, , Buffer
+            ReadAllText = MString.ConvertFromUTF8(Buffer)
+        Case EByteOrderMark.bom_UTF_8
+        
         Case Else
             s = Space(LOF(m_FNr) - Me.pos + 1)
             Get m_FNr, , s
@@ -1199,7 +1215,7 @@ End Function
 Private Function ReadBOM() As EByteOrderMark
     
     If m_FNr = 0 Then Me.OpenFile EFileMode.FileMode_Binary, FileAccess_Read, FileShare_Shared
-    Dim e As EByteOrderMark: Get m_FNr, 1, e 'von Position 0 lesen
+    Dim e As EByteOrderMark: Get m_FNr, 1, e 'read 4 bytes from position 0
     e = MString.EByteOrderMark_Parse(e)
     'jetzt seek setzen
     Dim fpos As Long
@@ -1269,9 +1285,9 @@ Try: On Error GoTo Catch
         Me.OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_Write
     End If
     If m_FMode = EFileMode.FileMode_Binary Then
-        Dim buffer() As Byte: buffer = aLine & vbCrLf
+        Dim Buffer() As Byte: Buffer = aLine & vbCrLf
         'Write #m_FNr, aLine & vbCrLf
-        Put #m_FNr, , buffer
+        Put #m_FNr, , Buffer
     Else
         'works only with EFileMode.FileMode_Binary
     End If
@@ -1409,29 +1425,29 @@ End Function
 
 Public Function ReadStrW(ByVal BytLen As Long) As String
     'Reads WideChar String
-    ReDim buffer(BytLen) As Byte
+    ReDim Buffer(BytLen) As Byte
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_ReadWrite
-    Get m_FNr, , buffer
-    ReadStrW = buffer
+    Get m_FNr, , Buffer
+    ReadStrW = Buffer
 End Function
 Public Sub WriteStrW(ByVal Value As String)
     'Writes WideChar String
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_ReadWrite
-    Dim buffer() As Byte: buffer = Value
-    Put m_FNr, , buffer
+    Dim Buffer() As Byte: Buffer = Value
+    Put m_FNr, , Buffer
 End Sub
 
 Public Sub ReadMem(ByVal pDst As LongPtr, ByVal BytLen As Long)
-    ReDim buffer(0 To BytLen) As Byte
+    ReDim Buffer(0 To BytLen) As Byte
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_ReadWrite
-    Get m_FNr, , buffer
-    RtlMoveMemory ByVal pDst, buffer(0), BytLen
+    Get m_FNr, , Buffer
+    RtlMoveMemory ByVal pDst, Buffer(0), BytLen
 End Sub
 Public Sub WriteMem(ByVal pSrc As LongPtr, ByVal BytLen As Long)
-    ReDim buffer(0 To BytLen) As Byte
-    RtlMoveMemory buffer(0), ByVal pSrc, BytLen
+    ReDim Buffer(0 To BytLen) As Byte
+    RtlMoveMemory Buffer(0), ByVal pSrc, BytLen
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_ReadWrite
-    Put m_FNr, , buffer
+    Put m_FNr, , Buffer
 End Sub
 
 ' ^ ############################## ^ '   Public Functions   ' ^ ############################## ^ '
