@@ -56,6 +56,8 @@ Private Sub mnuFileOpen_Click()
     Dim OFD As New OpenFileDialog
     If OFD.ShowDialog(Me) = vbCancel Then Exit Sub
     Dim f As String: f = OFD.FileName
+    MString.MsgBoxW f
+    
     'Debug.Print f
     Dim pfn As PathFileName: Set pfn = MNew.PathFileName(f)
 Try: On Error GoTo Catch
