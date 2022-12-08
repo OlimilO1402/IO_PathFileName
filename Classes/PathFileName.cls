@@ -816,17 +816,17 @@ Catch:
     End If
 End Function
 
-Public Function MoveTo(pfndst As PathFileName) As PathFileName
+Public Function MoveTo(PFNdst As PathFileName) As PathFileName
     'move = nach Dst kopieren und Src löschen
     'Move = verschieben, im Quellordner ist die Datei weg
     'Copy = Kopieren,    im Quellordner ist die Datei noch da
 Try: On Error GoTo Catch
-    Set MoveTo = Me.CopyTo(pfndst)
+    Set MoveTo = Me.CopyTo(PFNdst)
     If MoveTo Is Nothing Then Exit Function
     Me.Delete
     Exit Function
 Catch:
-    ErrHandler "MoveTo", m_PFN & vbCrLf & pfndst.Value
+    ErrHandler "MoveTo", m_PFN & vbCrLf & PFNdst.Value
 End Function
 
 Public Function Delete(Optional ByVal aPFN As String = vbNullString) As Boolean
@@ -922,7 +922,7 @@ Try: On Error GoTo Catch
     'aFShare = mFShare
     If m_FNr <> 0 Then OpenFile = m_FNr: Exit Function
     m_FNr = FreeFile
-    Dim pfn As String: pfn = Me.Value
+    Dim PFN As String: PFN = Me.Value
     m_FMode = fm
     m_FAccess = fa
     m_FShare = fs
@@ -931,11 +931,11 @@ Try: On Error GoTo Catch
         Select Case fa
         Case EFileAccess.FileAccess_None
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Append As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Append Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Append Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Append Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Append Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Append As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Append Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Append Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Append Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Append Shared As m_FNr
             End Select
         'Case EFileAccess.FileAccess_Read 'Not Possible
         '    Select Case aFShare
@@ -947,73 +947,73 @@ Try: On Error GoTo Catch
         '    End Select
         Case EFileAccess.FileAccess_Write
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Append Access Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Append Access Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Append Access Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Append Access Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Append Access Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Append Access Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Append Access Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Append Access Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Append Access Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Append Access Write Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Append Access Read Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Append Access Read Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Append Access Read Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Append Access Read Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Append Access Read Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Append Access Read Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Append Access Read Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Append Access Read Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Append Access Read Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Append Access Read Write Shared As m_FNr
             End Select
         End Select
     Case EFileMode.FileMode_Binary
         Select Case fa
         Case EFileAccess.FileAccess_None
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Binary As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Binary Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Binary Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Binary Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Binary Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Binary As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Binary Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Binary Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Binary Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Binary Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_Read
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Binary Access Read As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Binary Access Read Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Binary Access Read Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Binary Access Read As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Binary Access Read Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Binary Access Read Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Binary Access Read Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Binary Access Read Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_Write
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Binary Access Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Binary Access Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Binary Access Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Binary Access Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Binary Access Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Binary Access Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Binary Access Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Binary Access Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Binary Access Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Binary Access Write Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Binary Access Read Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Binary Access Read Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Binary Access Read Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Binary Access Read Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Binary Access Read Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Binary Access Read Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Binary Access Read Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Binary Access Read Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Binary Access Read Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Binary Access Read Write Shared As m_FNr
             End Select
         End Select
     Case EFileMode.FileMode_Input
         Select Case fa
         Case EFileAccess.FileAccess_None
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Input As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Input Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Input Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Input Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Input Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Input As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Input Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Input Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Input Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Input Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_Read
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Input Access Read As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Input Access Read Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Input Access Read Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Input Access Read Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Input Access Read Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Input Access Read As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Input Access Read Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Input Access Read Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Input Access Read Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Input Access Read Shared As m_FNr
             End Select
         'Case EFileAccess 'Not Possible
         '    Select Case fs
@@ -1036,11 +1036,11 @@ Try: On Error GoTo Catch
         Select Case fa
         Case EFileAccess.FileAccess_None
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Output As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Output Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Output Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Output Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Output Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Output As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Output Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Output Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Output Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Output Shared As m_FNr
             End Select
 '        Case EFileAccess
 '            Select Case fs 'Not Possible
@@ -1052,11 +1052,11 @@ Try: On Error GoTo Catch
 '            End Select
         Case EFileAccess.FileAccess_Write
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Output Access Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Output Access Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Output Access Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Output Access Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Output Access Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Output Access Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Output Access Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Output Access Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Output Access Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Output Access Write Shared As m_FNr
             End Select
             '    Case FileAccess_ReadWrite
             '      Select Case fs 'Not Possible
@@ -1071,35 +1071,35 @@ Try: On Error GoTo Catch
         Select Case fa
         Case EFileAccess.FileAccess_None
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Random As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Random Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Random Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Random Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Random Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Random As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Random Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Random Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Random Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Random Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_Read
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Random Access Read Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Random Access Read Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Random Access Read Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Random Access Read As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Random Access Read Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Random Access Read Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Random Access Read Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Random Access Read Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_Write
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Random Access Write As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Random Access Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Random Access Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Random Access Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Random Access Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Random Access Write As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Random Access Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Random Access Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Random Access Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Random Access Write Shared As m_FNr
             End Select
         Case EFileAccess.FileAccess_ReadWrite
             Select Case fs
-            Case EFileShare.FileShare_None:          Open pfn For Random Access Read As m_FNr
-            Case EFileShare.FileShare_LockRead:      Open pfn For Random Access Read Write Lock Read As m_FNr
-            Case EFileShare.FileShare_LockWrite:     Open pfn For Random Access Read Write Lock Write As m_FNr
-            Case EFileShare.FileShare_LockReadWrite: Open pfn For Random Access Read Write Lock Read Write As m_FNr
-            Case EFileShare.FileShare_Shared:        Open pfn For Random Access Read Write Shared As m_FNr
+            Case EFileShare.FileShare_None:          Open PFN For Random Access Read As m_FNr
+            Case EFileShare.FileShare_LockRead:      Open PFN For Random Access Read Write Lock Read As m_FNr
+            Case EFileShare.FileShare_LockWrite:     Open PFN For Random Access Read Write Lock Write As m_FNr
+            Case EFileShare.FileShare_LockReadWrite: Open PFN For Random Access Read Write Lock Read Write As m_FNr
+            Case EFileShare.FileShare_Shared:        Open PFN For Random Access Read Write Shared As m_FNr
             End Select
         End Select
     End Select
