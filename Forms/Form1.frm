@@ -10,6 +10,57 @@ Begin VB.Form Form1
    ScaleHeight     =   9780
    ScaleWidth      =   10335
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton BtnOpenExplorer 
+      Caption         =   "Open Explorer"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   44
+      Top             =   4800
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathMakeAbsolute2 
+      Caption         =   "Make Absolute ..\"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   49
+      Top             =   4440
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathMakeAbsolute1 
+      Caption         =   "Make Absolute"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   48
+      Top             =   4080
+      Width           =   1815
+   End
    Begin VB.CommandButton BtnFileAttributes 
       Caption         =   "File Attributes"
       BeginProperty Font 
@@ -41,7 +92,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   46
-      Top             =   6600
+      Top             =   7320
       Width           =   1815
    End
    Begin VB.CommandButton BtnInfo 
@@ -58,7 +109,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   43
-      Top             =   6120
+      Top             =   6840
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameDelete 
@@ -75,7 +126,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   41
-      Top             =   5640
+      Top             =   6360
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameMove 
@@ -92,7 +143,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   40
-      Top             =   5280
+      Top             =   6000
       Width           =   1815
    End
    Begin VB.CommandButton Command1 
@@ -109,7 +160,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   45
-      Top             =   4920
+      Top             =   5640
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameCreate 
@@ -126,24 +177,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   39
-      Top             =   4560
-      Width           =   1815
-   End
-   Begin VB.CommandButton BtnOpenExplorer 
-      Caption         =   "Open Explorer"
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   375
-      Left            =   8400
-      TabIndex        =   44
-      Top             =   4080
+      Top             =   5280
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathDelete 
@@ -841,6 +875,14 @@ Private Sub BtnPathFileNameDelete_Click()
     End If
 End Sub
 
+Private Sub BtnPathMakeAbsolute1_Click()
+    '
+End Sub
+
+Private Sub BtnPathMakeAbsolute2_Click()
+    '
+End Sub
+
 Private Sub BtnTestPathExists_Click()
     MsgBox "PathExists? " & vbCrLf & m_PFN.Path & vbCrLf & m_PFN.PathExists
 End Sub
@@ -991,63 +1033,67 @@ End Sub
 
 Private Sub AddExamples()
     View_Clear
-    'vollständiger Pfad: Datei auf lokalem Laufwerk
+    'complete path: file on a local drive
     LstBsps.AddItem "C:\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
     LstBsps.AddItem "\\SOLS_DS\Daten\TestDir\Unterverzeichnis\Datei.txt"
-    'vollständiger Pfad: Datei auf Netzwerk-Laufwerk
+    'complete path: file on a network-drive
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
-    'Wenn Teile fehlen
+    
+    'if parts are missing the path is relative
+    LstBsps.AddItem "SubFolder\File.txt"
+    LstBsps.AddItem "..\SubFolder\File.txt"
+    
     
     'special parsing obstacles
     LstBsps.AddItem "    \\ C:\ Dingspfad?=*+'# \\ DingsDAtei-.,;:_#+'*~´ß0987654321^°!""§$%&/()=?`\}][{³²"
     
-    'nur Drive
+    'only drive
     LstBsps.AddItem "C:"
     LstBsps.AddItem "C:\"
     LstBsps.AddItem "\\Server"
     LstBsps.AddItem "\\Server\"
     
-    'Drive fehlt
+    'drive is missing
     LstBsps.AddItem "Hauptverzeichnis\Unterverzeichnis\Datei.txt"
     LstBsps.AddItem "\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
 
-    'nur Pfad
+    'only path
     LstBsps.AddItem "Hauptverzeichnis\"
     LstBsps.AddItem "\Hauptverzeichnis\"
     LstBsps.AddItem "Hauptverzeichnis\Unterverzeichnis\"
     LstBsps.AddItem "\Hauptverzeichnis\Unterverzeichnis\"
     
-    'Pfad fehlt
+    'path is missing
     LstBsps.AddItem "C:\Datei.txt"
     LstBsps.AddItem "\\Server\Datei.txt"
     
-    'nur Datei
+    'only file
     LstBsps.AddItem "Datei"
     LstBsps.AddItem "\Datei"
     
-    'Datei fehlt
+    'file is missing
     LstBsps.AddItem "C:\Hauptverzeichnis\.txt"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\.txt"
     LstBsps.AddItem "C:\Hauptverzeichnis\Unterverzeichnis\.txt"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Unterverzeichnis\.txt"
     
-    'nur Extension
+    'only extension
     LstBsps.AddItem ".txt"
     LstBsps.AddItem ".Testtxt"
     
-    'Extension fehlt
+    'extension is missing
     LstBsps.AddItem "C:\Hauptverzeichnis\Datei"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Datei"
     LstBsps.AddItem "C:\Hauptverzeichnis\Unterverzeichnis\Datei"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Unterverzeichnis\Datei"
     
-    'Drive und Pfad fehlen
+    'drive and path are missing
     LstBsps.AddItem "Datei.txt"
     LstBsps.AddItem "Datei.Testtxt"
     LstBsps.AddItem "\Datei.txt"
     LstBsps.AddItem "\Datei.Testtxt"
     
-    'Drive und Datei fehlen
+    'drive and file are missing
     LstBsps.AddItem "Hauptverzeichnis\.txt"
     LstBsps.AddItem "Hauptverzeichnis\.Testtxt"
     LstBsps.AddItem "Hauptverzeichnis\Unterverzeichnis\.txt"
@@ -1055,37 +1101,37 @@ Private Sub AddExamples()
     LstBsps.AddItem "\Hauptverzeichnis\Unterverzeichnis\.txt"
     LstBsps.AddItem "\Hauptverzeichnis\Unterverzeichnis\.Testtxt"
     
-    'Drive und Extension fehlen
+    'drive and extension are missing
     LstBsps.AddItem "Hauptverzeichnis\Datei"
     LstBsps.AddItem "\Unterverzeichnis\Datei"
     LstBsps.AddItem "Hauptverzeichnis\Unterverzeichnis\Datei"
     LstBsps.AddItem "\Hauptverzeichnis\Unterverzeichnis\Datei"
     
-    'Pfad und Datei fehlen
+    'path and file are missing
     LstBsps.AddItem "C:\.txt"
     LstBsps.AddItem "\\Server\.txt"
     LstBsps.AddItem "C:\.Testtxt"
     LstBsps.AddItem "\\Server\.Testtxt"
 
-    'Pfad und Extension fehlen
+    'path and extension are missing
     LstBsps.AddItem "C:\Datei"
     LstBsps.AddItem "\\Server\Datei"
 
-    'Datei und Extension fehlen
+    'file and extension are missing
     LstBsps.AddItem "C:\Hauptverzeichnis\"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\"
     LstBsps.AddItem "C:\Hauptverzeichnis\Unterverzeichnis\"
     LstBsps.AddItem "\\Server\Hauptverzeichnis\Unterverzeichnis\"
     
-    'ein Verzeichnis Höher
+    'one directory higher
     LstBsps.AddItem ".\Unterverzeichnis\Datei"
     LstBsps.AddItem ".\Unterverzeichnis\Datei."
     LstBsps.AddItem ".\Unterverzeichnis\Datei.txt"
     LstBsps.AddItem ".\Hauptverzeichnis\Unterverzeichnis\Datei"
     LstBsps.AddItem ".\Hauptverzeichnis\Unterverzeichnis\Datei."
     LstBsps.AddItem ".\Hauptverzeichnis\Unterverzeichnis\Datei.txt"
-
-    'ein Verzeichnis Höher
+    
+    'one directory higher
     LstBsps.AddItem "..\Unterverzeichnis\Datei."
     LstBsps.AddItem "..\Unterverzeichnis\Datei.txt"
     LstBsps.AddItem "..\Hauptverzeichnis\Unterverzeichnis\Datei"
@@ -1094,8 +1140,6 @@ Private Sub AddExamples()
     
     'for stressing reasons we add a little bit of brainfuck ;-)
     LstBsps.AddItem ".:\.:.:.:..\:\.\\:\\.....\\.\..\\\.\"
-    
-    'for stressing reasons we add a little bit of brainfuck ;-)
     LstBsps.AddItem ".:\.:.:.:..\:\.\\:\\.....\\.\..\\\.\"
     LstBsps.AddItem "A:\.:.:.:..\:\.\\:\\.....\\.\..\\\.\"
     LstBsps.AddItem "\\.:.:.:..\:\.\\:\\.....\\.\..\\\.\"
