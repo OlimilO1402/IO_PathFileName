@@ -7,9 +7,9 @@ Public Function PathFileName(ByVal aPathOrPFN As String, _
     Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
 End Function
 
-Public Function PFNStreamW(PFN As PathFileName) As PFNStreamW
-    Set PFNStreamW = New PFNStreamW: PFNStreamW.New_ PFN
-End Function
+'Public Function PFNStreamW(PFN As PathFileName) As PFNStreamW
+'    Set PFNStreamW = New PFNStreamW: PFNStreamW.New_ PFN
+'End Function
 
 'Function IsInIDE() As Boolean
 'Try: On Error GoTo Catch

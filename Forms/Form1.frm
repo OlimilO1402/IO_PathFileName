@@ -23,12 +23,12 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   44
-      Top             =   4800
+      TabIndex        =   43
+      Top             =   4560
       Width           =   1815
    End
-   Begin VB.CommandButton BtnPathMakeAbsolute2 
-      Caption         =   "Make Absolute ..\"
+   Begin VB.CommandButton BtnPathJoin 
+      Caption         =   "Path Join ..\"
       BeginProperty Font 
          Name            =   "Tahoma"
          Size            =   9
@@ -40,24 +40,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   49
-      Top             =   4440
-      Width           =   1815
-   End
-   Begin VB.CommandButton BtnPathMakeAbsolute1 
-      Caption         =   "Make Absolute"
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   375
-      Left            =   8400
-      TabIndex        =   48
+      TabIndex        =   47
       Top             =   4080
       Width           =   1815
    End
@@ -74,7 +57,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   47
+      TabIndex        =   46
       Top             =   2040
       Width           =   1815
    End
@@ -91,7 +74,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   46
+      TabIndex        =   45
       Top             =   7320
       Width           =   1815
    End
@@ -108,7 +91,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   43
+      TabIndex        =   42
       Top             =   6840
       Width           =   1815
    End
@@ -125,7 +108,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   41
+      TabIndex        =   40
       Top             =   6360
       Width           =   1815
    End
@@ -142,7 +125,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   40
+      TabIndex        =   39
       Top             =   6000
       Width           =   1815
    End
@@ -159,7 +142,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   45
+      TabIndex        =   44
       Top             =   5640
       Width           =   1815
    End
@@ -176,7 +159,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   39
+      TabIndex        =   38
       Top             =   5280
       Width           =   1815
    End
@@ -193,7 +176,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   42
+      TabIndex        =   41
       Top             =   3720
       Width           =   1815
    End
@@ -210,7 +193,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   37
+      TabIndex        =   36
       Top             =   3360
       Width           =   1815
    End
@@ -278,7 +261,7 @@ Begin VB.Form Form1
       EndProperty
       Height          =   375
       Left            =   8400
-      TabIndex        =   38
+      TabIndex        =   37
       Top             =   1320
       Width           =   1815
    End
@@ -546,23 +529,6 @@ Begin VB.Form Form1
       TabIndex        =   0
       Top             =   3360
       Width           =   8175
-   End
-   Begin VB.Label Label1 
-      Caption         =   "Label1"
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   255
-      Left            =   7440
-      TabIndex        =   36
-      Top             =   840
-      Width           =   615
    End
    Begin VB.Label LblPathOrFile 
       Caption         =   "Label1"
@@ -875,12 +841,17 @@ Private Sub BtnPathFileNameDelete_Click()
     End If
 End Sub
 
-Private Sub BtnPathMakeAbsolute1_Click()
-    '
-End Sub
-
-Private Sub BtnPathMakeAbsolute2_Click()
-    '
+Private Sub BtnPathJoin_Click()
+    
+    Dim basepath As PathFileName: Set basepath = MNew.PathFileName(App.Path)
+    Dim spfncls  As String:            spfncls = "..\..\MyRepo\Classes\MyClass1.cls"
+    Dim pfn_cls  As PathFileName:  Set pfn_cls = MNew.PathFileName(spfncls)
+    
+    pfn_cls.PathJoin basepath
+    
+    MsgBox basepath.Value & " & " & spfncls & " = " & vbCrLf & _
+            pfn_cls.Value
+        
 End Sub
 
 Private Sub BtnTestPathExists_Click()
