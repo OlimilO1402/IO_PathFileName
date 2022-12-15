@@ -3,17 +3,17 @@
 
 [![GitHub](https://img.shields.io/github/license/OlimilO1402/IO_PathFileName?style=plastic)](https://github.com/OlimilO1402/IO_PathFileName/blob/master/LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/OlimilO1402/IO_PathFileName?style=plastic)](https://github.com/OlimilO1402/IO_PathFileName/releases/latest)
-[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/IO_PathFileName/total.svg)](https://github.com/OlimilO1402/IO_PathFileName/releases/download/v2.3.4/IO_PathFileName.zip)
+[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/IO_PathFileName/total.svg)](https://github.com/OlimilO1402/IO_PathFileName/releases/download/v2022.12.15/PathFileName_v2022.12.15.zip)
 [![Follow](https://img.shields.io/github/followers/OlimilO1402.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/OlimilO1402/IO_PathFileName/watchers)
 
 The functions in this class went with me like forever, like for the very first beginning maybe around february 1998.  
 Of course the functions have constantly changed over time. In former times the class actually consisted of 3 classes:  
-PathFileName, PFNStream, PFNProg where PFNStream and PFNProg used PathFileName like in decorator-pattern.  
+PathFileName, PFNStream, PFNProg where PFNStream and PFNProg wrapped PathFileName like in a decorator-pattern.  
 If you know a function you need on files, that is not included in the class, let me know or start an issue.  
 When I was first digging into the dotnet-Fx in 2003 I was very confused why there is not such a class contained.  
-Instead there are plenty of classes doing similar things, making the framework bloated, and cofusing the programmer.  
+Instead there are some classes doing similar things, making the framework bloated, and cofusing the programmer.  
 
-it assumes that every pathfilename consists of the following parts:  
+The class PathFileName assumes that every pathfilename consists of the following parts:  
 - Path  
     + Drive / servername  
 	+ PathOnly  
