@@ -6,7 +6,7 @@
 [![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/IO_PathFileName/total.svg)](https://github.com/OlimilO1402/IO_PathFileName/releases/download/v2022.12.15/PathFileName_v2022.12.15.zip)
 [![Follow](https://img.shields.io/github/followers/OlimilO1402.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/OlimilO1402/IO_PathFileName/watchers)
 
-[![GitHub followers](https://img.shields.io/github/followers/OlimilO1402?style=social&label=Follow)](https://github.com/OlimilO1402/OlimilO1402/)
+[![GitHub followers](https://img.shields.io/github/followers/OlimilO1402?style=social&label=Follow)](https://github.com/OlimilO1402/)
 
 
 The functions in this class went with me like forever, like for the very first beginning maybe around february 1998.  
