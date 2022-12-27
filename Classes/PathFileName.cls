@@ -201,7 +201,7 @@ Private Function New_PathFileName(ByVal aPathFileName As String, _
                          Optional ByVal aExt As String) As PathFileName
     Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
-'Copy to MNew:
+''Copy to MNew:
 'Public Function PathFileName(ByVal aPathFileName As String, _
 '                     Optional ByVal aFileName As String, _
 '                     Optional ByVal aExt As String) As PathFileName
@@ -880,7 +880,7 @@ TryE: On Error GoTo CatchE
     If Not RenFile.Exists Then
         'Wird nicht renamed wenn es die Datei schon gibt
         Cmd = Chr(34) & Me.Value & Chr(34) & " " & Chr(34) & RenFile.Value & Chr(34)
-        Call Shell("cmd /c ren " & Cmd, 0)
+        Call ShellWait("cmd /c ren " & Cmd, VbAppWinStyle.vbHide)
         Rename = True
         If BolRenameMe Then
             'soll nur die Datei auf der Festplatte umbenannt werden

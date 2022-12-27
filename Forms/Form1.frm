@@ -10,6 +10,40 @@ Begin VB.Form Form1
    ScaleHeight     =   9780
    ScaleWidth      =   10335
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton BtnPathFileNameDelete 
+      Caption         =   "Delete File"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   40
+      Top             =   6360
+      Width           =   1815
+   End
+   Begin VB.CommandButton BtnPathFileNameRename 
+      Caption         =   "Rename File"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   48
+      Top             =   6000
+      Width           =   1815
+   End
    Begin VB.CommandButton BtnOpenExplorer 
       Caption         =   "Open Explorer"
       BeginProperty Font 
@@ -24,7 +58,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   43
-      Top             =   4560
+      Top             =   4440
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathJoin 
@@ -95,23 +129,6 @@ Begin VB.Form Form1
       Top             =   6840
       Width           =   1815
    End
-   Begin VB.CommandButton BtnPathFileNameDelete 
-      Caption         =   "Delete File"
-      BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   375
-      Left            =   8400
-      TabIndex        =   40
-      Top             =   6360
-      Width           =   1815
-   End
    Begin VB.CommandButton BtnPathFileNameMove 
       Caption         =   "Move File"
       BeginProperty Font 
@@ -126,10 +143,10 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   39
-      Top             =   6000
+      Top             =   5640
       Width           =   1815
    End
-   Begin VB.CommandButton Command1 
+   Begin VB.CommandButton BtnPathFileNameCopy 
       Caption         =   "Copy File"
       BeginProperty Font 
          Name            =   "Tahoma"
@@ -143,7 +160,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   44
-      Top             =   5640
+      Top             =   5280
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameCreate 
@@ -160,7 +177,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   38
-      Top             =   5280
+      Top             =   4920
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathDelete 
@@ -809,6 +826,10 @@ Private Sub BtnPathFileNameCreate_Click()
      m_PFN.CloseFile
 End Sub
 
+Private Sub BtnPathFileNameCopy_Click()
+    '
+End Sub
+
 Private Sub BtnPathFileNameMove_Click()
     If Not m_PFN.Exists Then
         If MsgBox("Nothing to move, file not found, create a file? " & vbCrLf & m_PFN.Value, vbOKCancel) = vbCancel Then Exit Sub
@@ -824,6 +845,16 @@ Private Sub BtnPathFileNameMove_Click()
             pathToMove.PathCreate
         End If
         Set m_PFN = m_PFN.MoveTo(pathToMove)
+    End If
+End Sub
+
+Private Sub BtnPathFileNameRename_Click()
+    Dim fnam As String: fnam = m_PFN.FileName
+    'fnam = InputBox("New Name:", "Rename the file", fnam)
+    If Len(fnam) = 0 Then Exit Sub
+    If StrPtr(fnam) = 0 Then Exit Sub
+    If m_PFN.Rename(fnam, True) Then
+        MsgBoxW "File successfllly renamed:" & vbCrLf & fnam & vbCrLf & m_PFN.FileName
     End If
 End Sub
 
