@@ -1339,11 +1339,12 @@ Catch:
     ErrHandler "CloseFile", m_PFN
 End Sub
 
-Public Function ReadByt() As Byte
+' v ############################## v '    BinaryReader/Writer Functions    ' v ############################## v '
+Public Function ReadByte() As Byte
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadByt
+    Get m_FNr, , ReadByte
 End Function
-Public Sub WriteByt(ByVal Value As Byte)
+Public Sub WriteByte(ByVal Value As Byte)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
@@ -1357,20 +1358,20 @@ Public Sub WriteChrW(ByVal aCharW As Integer)
     Put m_FNr, , aCharW
 End Sub
 
-Public Function ReadInt() As Integer
+Public Function ReadInt16() As Integer
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadInt
+    Get m_FNr, , ReadInt16
 End Function
-Public Sub WriteInt(ByVal Value As Integer)
+Public Sub WriteInt16(ByVal Value As Integer)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadLng() As Long
+Public Function ReadInt32() As Long
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadLng
+    Get m_FNr, , ReadInt32
 End Function
-Public Sub WriteLng(ByVal Value As Long)
+Public Sub WriteInt32(ByVal Value As Long)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
@@ -1384,38 +1385,38 @@ Public Sub WriteCur(ByVal Value As Currency)
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadSng() As Single
+Public Function ReadSingle() As Single
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadSng
+    Get m_FNr, , ReadSingle
 End Function
-Public Sub WriteSng(ByVal Value As Single)
+Public Sub WriteSingle(ByVal Value As Single)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadDbl() As Double
+Public Function ReadDouble() As Double
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadDbl
+    Get m_FNr, , ReadDouble
 End Function
-Public Sub WriteDbl(ByVal Value As Double)
+Public Sub WriteDouble(ByVal Value As Double)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadDat() As Date
+Public Function ReadDate() As Date
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadDat
+    Get m_FNr, , ReadDate
 End Function
-Public Sub WriteDat(ByVal Value As Date)
+Public Sub WriteDate(ByVal Value As Date)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
 
-Public Function ReadVar() As Variant
+Public Function ReadVariant() As Variant
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
-    Get m_FNr, , ReadVar
+    Get m_FNr, , ReadVariant
 End Function
-Public Sub WriteVar(ByVal Value As Variant)
+Public Sub WriteVariant(ByVal Value As Variant)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
 End Sub
@@ -1477,6 +1478,7 @@ Public Sub WriteMem(ByVal pSrc As LongPtr, ByVal BytLen As Long)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, EFileAccess.FileAccess_ReadWrite
     Put m_FNr, , Buffer
 End Sub
+' ^ ############################## ^ '    BinaryReader/Writer Functions    ' ^ ############################## ^ '
 
 ' ^ ############################## ^ '   Public Functions   ' ^ ############################## ^ '
 
