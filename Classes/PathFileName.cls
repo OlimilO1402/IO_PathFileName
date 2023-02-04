@@ -458,7 +458,7 @@ Public Property Get IsEOF() As Boolean
 End Property
 
 Public Property Get HasBOM() As Boolean
-    Dim i As Integer: i = Me.ReadInt
+    Dim i As Integer: i = Me.ReadInt16
     HasBOM = i = &HFFFE Or i = &HFEFF
     'If i = &H5B Then
     '    FileIsUnicode = True
