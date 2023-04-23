@@ -10,6 +10,23 @@ Begin VB.Form Form1
    ScaleHeight     =   9780
    ScaleWidth      =   10335
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton BtnCreateSubPath 
+      Caption         =   "Create Sub-Path"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   49
+      Top             =   3720
+      Width           =   1815
+   End
    Begin VB.CommandButton BtnPathFileNameDelete 
       Caption         =   "Delete File"
       BeginProperty Font 
@@ -24,7 +41,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   40
-      Top             =   6360
+      Top             =   7080
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameRename 
@@ -41,7 +58,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   48
-      Top             =   6000
+      Top             =   6720
       Width           =   1815
    End
    Begin VB.CommandButton BtnOpenExplorer 
@@ -58,7 +75,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   43
-      Top             =   4440
+      Top             =   5160
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathJoin 
@@ -75,7 +92,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   47
-      Top             =   4080
+      Top             =   4800
       Width           =   1815
    End
    Begin VB.CommandButton BtnFileAttributes 
@@ -109,7 +126,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   45
-      Top             =   7320
+      Top             =   8040
       Width           =   1815
    End
    Begin VB.CommandButton BtnInfo 
@@ -126,7 +143,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   42
-      Top             =   6840
+      Top             =   7560
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameMove 
@@ -143,7 +160,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   39
-      Top             =   5640
+      Top             =   6360
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameCopy 
@@ -160,7 +177,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   44
-      Top             =   5280
+      Top             =   6000
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathFileNameCreate 
@@ -177,7 +194,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   38
-      Top             =   4920
+      Top             =   5640
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathDelete 
@@ -194,7 +211,7 @@ Begin VB.Form Form1
       Height          =   375
       Left            =   8400
       TabIndex        =   41
-      Top             =   3720
+      Top             =   4440
       Width           =   1815
    End
    Begin VB.CommandButton BtnPathCreate 
@@ -917,6 +934,10 @@ Private Sub BtnPathCreate_Click()
         m_PFN.PathCreate
         MsgBox IIf(m_PFN.PathExists, "Path successfully created: ", "Could not create Path: ") & vbCrLf & m_PFN.Path
     End If
+End Sub
+
+Private Sub BtnCreateSubPath_Click()
+    
 End Sub
 
 Private Sub BtnPathDelete_Click()
