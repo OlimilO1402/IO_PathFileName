@@ -11,7 +11,7 @@ Of course the functions have constantly changed over time. In former times the c
 PathFileName, PFNStream, PFNProg where PFNStream and PFNProg wrapped PathFileName like in a decorator-pattern.  
 If you know a function you need on files, that is not included in the class, let me know or start an issue.  
 When I was first digging into the dotnet-Fx in 2003 I was very confused why there is not such a class contained.  
-Instead there are some classes doing similar things, making the framework bloated, and cofusing the programmer.  
+Instead there are some classes doing similar things, making the framework bloated, and confusing the programmer.  
 
 The class PathFileName assumes that every pathfilename consists of the following parts:  
 - Path  
