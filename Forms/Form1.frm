@@ -5,15 +5,41 @@ Begin VB.Form Form1
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   10335
+   BeginProperty Font 
+      Name            =   "Segoe UI"
+      Size            =   8.25
+      Charset         =   0
+      Weight          =   400
+      Underline       =   0   'False
+      Italic          =   0   'False
+      Strikethrough   =   0   'False
+   EndProperty
    Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   9780
    ScaleWidth      =   10335
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton Command1 
+      Caption         =   "Command1"
+      BeginProperty Font 
+         Name            =   "Segoe UI"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   8400
+      TabIndex        =   50
+      Top             =   8520
+      Width           =   1815
+   End
    Begin VB.CommandButton BtnCreateSubPath 
       Caption         =   "Create Sub-Path"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -30,7 +56,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathFileNameDelete 
       Caption         =   "Delete File"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -47,7 +73,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathFileNameRename 
       Caption         =   "Rename File"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -64,7 +90,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnOpenExplorer 
       Caption         =   "Open Explorer"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -81,7 +107,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathJoin 
       Caption         =   "Path Join ..\"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -98,7 +124,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnFileAttributes 
       Caption         =   "File Attributes"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -115,7 +141,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTestUnicode 
       Caption         =   "TestUnicode >>"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -132,7 +158,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnInfo 
       Caption         =   "Info"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -149,7 +175,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathFileNameMove 
       Caption         =   "Move File"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -166,7 +192,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathFileNameCopy 
       Caption         =   "Copy File"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -183,7 +209,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathFileNameCreate 
       Caption         =   "Create File"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -200,7 +226,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathDelete 
       Caption         =   "Delete Path"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -217,7 +243,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnPathCreate 
       Caption         =   "Create Path"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -234,7 +260,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTestStartWaitCalc 
       Caption         =   "Start ClickMe && Wait"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -251,7 +277,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTestStartCalc 
       Caption         =   "Start Calc.exe"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -268,7 +294,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTestExists 
       Caption         =   "File Exists?"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -285,7 +311,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTestPathExists 
       Caption         =   "Path Exists?"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -302,7 +328,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnIsPathOrFile 
       Caption         =   "IsPath/IsFile"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -319,7 +345,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnUserPath 
       Caption         =   "User-Path"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -336,7 +362,7 @@ Begin VB.Form Form1
    Begin VB.CommandButton BtnTempPath 
       Caption         =   "Temp-Path"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -352,6 +378,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnFileName 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   25
@@ -361,6 +396,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnExtension 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   24
@@ -370,6 +414,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnFileNameOnly 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   23
@@ -379,6 +432,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnPath 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   22
@@ -388,6 +450,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnPathOnly 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   21
@@ -397,6 +468,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnPFN 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   7920
       TabIndex        =   20
@@ -423,6 +503,15 @@ Begin VB.Form Form1
    End
    Begin VB.CommandButton BtnDrive 
       Caption         =   "/"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
       Height          =   255
       Left            =   5160
       TabIndex        =   18
@@ -567,8 +656,8 @@ Begin VB.Form Form1
    Begin VB.Label LblPathOrFile 
       Caption         =   "Label1"
       BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9.75
+         Name            =   "Segoe UI"
+         Size            =   9
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -585,7 +674,7 @@ Begin VB.Form Form1
       AutoSize        =   -1  'True
       Caption         =   "Shorted:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -593,17 +682,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   28
       Top             =   840
-      Width           =   720
+      Width           =   660
    End
    Begin VB.Label Lbl1Quoted 
       AutoSize        =   -1  'True
       Caption         =   "PFN.Quoted:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -611,17 +700,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   27
       Top             =   480
-      Width           =   1065
+      Width           =   1020
    End
    Begin VB.Label LblPathFileName1 
       AutoSize        =   -1  'True
       Caption         =   "PathFileName:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -629,7 +718,7 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   26
       Top             =   120
@@ -639,7 +728,7 @@ Begin VB.Form Form1
       AutoSize        =   -1  'True
       Caption         =   "Label1"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -647,17 +736,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   1320
       TabIndex        =   11
       Top             =   480
-      Width           =   525
+      Width           =   510
    End
    Begin VB.Label LblPFNShorted 
       AutoSize        =   -1  'True
       Caption         =   "Label1"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -665,17 +754,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   1320
       TabIndex        =   10
       Top             =   840
-      Width           =   525
+      Width           =   510
    End
    Begin VB.Label LblFileNameOnly1 
       AutoSize        =   -1  'True
       Caption         =   "FileNameOnly:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -683,17 +772,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   9
       Top             =   2280
-      Width           =   1140
+      Width           =   1170
    End
    Begin VB.Label LblPathOnly1 
       AutoSize        =   -1  'True
       Caption         =   "PathOnly:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -701,53 +790,53 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   8
       Top             =   1560
-      Width           =   795
+      Width           =   780
    End
    Begin VB.Label LblPathCount 
       AutoSize        =   -1  'True
       Caption         =   "Label2"
       BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9.75
+         Name            =   "Segoe UI"
+         Size            =   9
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   240
+      Height          =   225
       Left            =   6600
       TabIndex        =   7
       Top             =   1200
-      Width           =   555
+      Width           =   510
    End
    Begin VB.Label LblPathCount1 
       AutoSize        =   -1  'True
       Caption         =   "PathCount:"
       BeginProperty Font 
-         Name            =   "Tahoma"
-         Size            =   9.75
+         Name            =   "Segoe UI"
+         Size            =   9
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   240
+      Height          =   225
       Left            =   5640
       TabIndex        =   6
       Top             =   1200
-      Width           =   945
+      Width           =   900
    End
    Begin VB.Label LblExtension1 
       AutoSize        =   -1  'True
       Caption         =   "Extension:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -755,17 +844,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   4
       Top             =   2640
-      Width           =   855
+      Width           =   810
    End
    Begin VB.Label LblFileName1 
       AutoSize        =   -1  'True
       Caption         =   "FileName:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -773,17 +862,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   3
       Top             =   3000
-      Width           =   780
+      Width           =   795
    End
    Begin VB.Label LblPath1 
       AutoSize        =   -1  'True
       Caption         =   "Path:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -791,17 +880,17 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   2
       Top             =   1920
-      Width           =   435
+      Width           =   405
    End
    Begin VB.Label LblDrive1 
       AutoSize        =   -1  'True
       Caption         =   "Drive:"
       BeginProperty Font 
-         Name            =   "Tahoma"
+         Name            =   "Segoe UI"
          Size            =   9
          Charset         =   0
          Weight          =   400
@@ -809,11 +898,11 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   210
+      Height          =   225
       Left            =   120
       TabIndex        =   1
       Top             =   1200
-      Width           =   465
+      Width           =   450
    End
 End
 Attribute VB_Name = "Form1"
@@ -936,10 +1025,6 @@ Private Sub BtnPathCreate_Click()
     End If
 End Sub
 
-Private Sub BtnCreateSubPath_Click()
-    
-End Sub
-
 Private Sub BtnPathDelete_Click()
     Dim s As String: s = TxtPFN.Text
     If Len(s) = 0 Then Exit Sub
@@ -978,6 +1063,12 @@ End Sub
 Private Sub BtnFileAttributes_Click()
     If m_PFN.Exists Then
         MsgBox m_PFN.AttributesToStr
+    End If
+End Sub
+
+Private Sub Command1_Click()
+    If MShell.ExecuteAdminWOFSRedir("cmd.exe", Me.hwnd) Then
+        MsgBox "OK"
     End If
 End Sub
 

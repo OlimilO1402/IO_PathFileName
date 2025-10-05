@@ -7,11 +7,11 @@ Attribute VB_Name = "MShell"
 '
 Option Explicit 'OM 06.11.2015 13:45; Zeilen: 118
 'And Win64
-#If VBA7 = 0 Then
+'#If VBA7 = 0 Then
     'Private Enum LongPtr
     '    [_]
     'End Enum
-#End If
+'#End If
 
 Private Type STARTUPINFO       ' x86,   x64
     cb              As Long    '   4      4
@@ -87,6 +87,15 @@ End Type
         
     Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As LongPtr) As Long
     
+    'Private Declare Function ShellExecuteW Lib "shell32" (ByVal hwnd As LongPtr, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+    Private Declare Function ShellExecuteW Lib "shell32" (ByVal hwnd As LongPtr, ByVal lpOperation As LongPtr, ByVal lpFile As LongPtr, ByVal lpParameters As LongPtr, ByVal lpDirectory As LongPtr, ByVal nShowCmd As Long) As Long
+    
+    'https://learn.microsoft.com/de-de/windows/win32/api/wow64apiset/nf-wow64apiset-wow64disablewow64fsredirection
+    Private Declare Function Wow64DisableWow64FsRedirection Lib "kernel32" (ByRef oldvalue_out As LongPtr) As Long
+    
+    'https://learn.microsoft.com/de-de/windows/win32/api/wow64apiset/nf-wow64apiset-wow64revertwow64fsredirection
+    Private Declare Function Wow64RevertWow64FsRedirection Lib "kernel32" (ByVal oldvalue As LongPtr) As Long
+    
 #End If
 
 Private Const INFINITE              As Long = -1&
@@ -144,6 +153,20 @@ Public Function ShellWait(ByVal PathName As String, _
         CloseHandle .hProcess
         
     End With
+End Function
+
+Public Function ExecuteAdminWOFSRedir(ByVal cmd As String, Optional ByVal aHwnd As LongPtr, Optional ByVal WindowStyle As VbAppWinStyle = VbAppWinStyle.vbNormalFocus) As Boolean
+    
+    Dim lpWow64RedirectReturn As LongPtr
+    Dim BOOL As Long
+    BOOL = Wow64DisableWow64FsRedirection(lpWow64RedirectReturn)
+    If BOOL = 0 Then Exit Function
+    Dim sRunAs As String: sRunAs = "runas"
+    Dim lpParams As LongPtr, lpDir As LongPtr
+    Dim hr As Long: hr = ShellExecuteW(aHwnd, StrPtr(sRunAs), StrPtr(cmd), lpParams, lpDir, WindowStyle)
+    BOOL = Wow64RevertWow64FsRedirection(lpWow64RedirectReturn)
+    ExecuteAdminWOFSRedir = BOOL <> 0
+    
 End Function
 '
 '#Else

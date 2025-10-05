@@ -23,6 +23,11 @@ Attribute VB_Exposed = False
 ' * VBA6 (VBA before 2007)
 ' * VBA7-x86
 ' * VBA7-X64
+'For this class to compile you also need:
+'* MShell.bas  from the same repo                     in folder \Modules\
+'* MString.bas from the repo Sys_Strings              in folder \Modules\
+'* MPtr.bas    from the repo Ptr_Pointers             in folder \Modules\
+'* MErr.bas    from the repo Err_CorrectErrorHandling in folder \Modules\
 '
 'a PathFileName consists of the following parts:
 'Drive     |      Only path      |   Only filename  |  extension
@@ -31,9 +36,6 @@ Attribute VB_Exposed = False
 'resp:
 '      Path (=Drive+OnlyPath)    |  Filename
 '  C:\Windows\System32\          |  user32.dll
-'For this class you will also need the modules:
-'* IO_PathFileName\Modules\MShell.bas
-'* Err_CorrectErrorHandling\Modules\MErr.bas
 
 Option Explicit
 'OM 06.11.2015 13:45; Zeilen:  336
@@ -56,7 +58,7 @@ Option Explicit
     'Private Enum LongPtr
     '    [_]
     'End Enum
-    Private Declare Function ShellExecuteW Lib "Shell32" ( _
+    Private Declare Function ShellExecuteW Lib "shell32" ( _
         ByVal hwnd As LongPtr, _
         ByVal lpOperation As LongPtr, _
         ByVal lpFile As LongPtr, _
@@ -142,7 +144,7 @@ Private Const C_3Pt          As String = "..."
 
 Private m_PFN     As String 'the Value
 Private m_IsValid As Boolean
-
+Private m_enc     As ETextEncoding
 Private m_FNr     As Integer
 Private m_FMode   As EFileMode
 Private m_FAccess As EFileAccess
@@ -151,6 +153,7 @@ Private m_FShare  As EFileShare
 ' v ############################## v '    Constructors      ' v ############################## v '
 Private Sub Class_Initialize()
     m_FAccess = FileAccess_ReadWrite
+    m_enc = ETextEncoding.Text_UnicodeEncoding
 End Sub
 Private Sub Class_Terminate()
     Me.CloseFile
@@ -219,40 +222,40 @@ Public Property Let AttributesX(ByVal Value As EFileAttribute)
 End Property
 
 Public Function AttributesToStr() As String
-    Dim e As EFileAttribute: e = Me.AttributesX
+    Dim E As EFileAttribute: E = Me.AttributesX
     Dim s As String ': s = ""
-    If e = EFileAttribute.None Then s = "None"
-    If e And EFileAttribute.ReadOnly Then _
+    If E = EFileAttribute.None Then s = "None"
+    If E And EFileAttribute.ReadOnly Then _
         s = s & IIf(Len(s), " ", "") & "ReadOnly"
-    If e And EFileAttribute.Hidden Then _
+    If E And EFileAttribute.Hidden Then _
         s = s & IIf(Len(s), " ", "") & "Hidden"
-    If e And EFileAttribute.Volume Then _
+    If E And EFileAttribute.Volume Then _
         s = s & IIf(Len(s), " ", "") & "Volume"
-    If e And EFileAttribute.Directory Then _
+    If E And EFileAttribute.Directory Then _
         s = s & IIf(Len(s), " ", "") & "Directory"
-    If e And EFileAttribute.Archive Then _
+    If E And EFileAttribute.Archive Then _
         s = s & IIf(Len(s), " ", "") & "Archive"
-    If e And EFileAttribute.Device Then _
+    If E And EFileAttribute.Device Then _
         s = s & IIf(Len(s), " ", "") & "Device"
-    If e And EFileAttribute.Normal Then _
+    If E And EFileAttribute.Normal Then _
         s = s & IIf(Len(s), " ", "") & "Normal"
-    If e And EFileAttribute.Temporary Then _
+    If E And EFileAttribute.Temporary Then _
         s = s & IIf(Len(s), " ", "") & "Temporary"
-    If e And EFileAttribute.SparseFile Then _
+    If E And EFileAttribute.SparseFile Then _
         s = s & IIf(Len(s), " ", "") & "SparseFile"
-    If e And EFileAttribute.ReparsePoint Then _
+    If E And EFileAttribute.ReparsePoint Then _
         s = s & IIf(Len(s), " ", "") & "ReparsePoint"
-    If e And EFileAttribute.Compressed Then _
+    If E And EFileAttribute.Compressed Then _
         s = s & IIf(Len(s), " ", "") & "Compressed"
-    If e And EFileAttribute.Offline Then _
+    If E And EFileAttribute.Offline Then _
         s = s & IIf(Len(s), " ", "") & "Offline"
-    If e And EFileAttribute.NotContentIndexed Then _
+    If E And EFileAttribute.NotContentIndexed Then _
         s = s & IIf(Len(s), " ", "") & "NotContentIndexed"
-    If e And EFileAttribute.Encrypted Then _
+    If E And EFileAttribute.Encrypted Then _
         s = s & IIf(Len(s), " ", "") & "Encrypted"
-    If e And EFileAttribute.IntegrityStream Then _
+    If E And EFileAttribute.IntegrityStream Then _
         s = s & IIf(Len(s), " ", "") & "IntegrityStream"
-    If e And EFileAttribute.NoScrubData Then _
+    If E And EFileAttribute.NoScrubData Then _
         s = s & IIf(Len(s), " ", "") & "NoScrubData"
     AttributesToStr = s
 End Function
@@ -476,7 +479,7 @@ Public Sub OpenFileExplorer()
     Shell "Explorer.exe " & Me.Path, vbNormalFocus
 End Sub
 '#If VBA7 Then
-Public Function Start(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
+Public Function Start(Optional ByVal cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus) As Long
 Try:     On Error GoTo Catch
     'startet ohne zu warten = asynchron
     Dim ret As Long
@@ -492,16 +495,16 @@ Try:     On Error GoTo Catch
         End If
         Exit Function
     Else
-        Dim e As String: e = UCase(Me.Extension)
-        If e = "EXE" Or e = "BAT" Then
+        Dim E As String: E = UCase(Me.Extension)
+        If E = "EXE" Or E = "BAT" Then
             'ein ausführbares programm
-            Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
-            ret = Shell(Cmd, WindowStyle) ' liefert die TaskID
+            cmd = IIf(Len(cmd) = 0, m_PFN, m_PFN & " " & cmd)
+            ret = Shell(cmd, WindowStyle) ' liefert die TaskID
         Else
             'ein Dokument
             Dim hwnd As LongPtr
             'Debug.Print m_PFN
-            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(Cmd), StrPtr(Me.Path), WindowStyle)
+            ret = ShellExecuteW(hwnd, StrPtr("Open"), StrPtr(Me.Quoted), StrPtr(cmd), StrPtr(Me.Path), WindowStyle)
         End If
     End If
     Start = ret
@@ -510,18 +513,18 @@ Catch:
     ErrHandler "Start"
 End Function
     
-Public Function StartWait(Optional ByVal Cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String = "") As Long
+Public Function StartWait(Optional ByVal cmd As String = "", Optional ByVal WindowStyle As VbAppWinStyle = vbNormalFocus, Optional ByVal WorkDir As String = "") As Long
 Try: On Error GoTo Catch
     'startet und wartet = synchron
     'geht jetzt nur bei exe (oder bat?)
-    Dim e As String: e = UCase(Me.Extension)
-    If Not (e = ".EXE" Or e = ".BAT" Or e = ".COM") Then
+    Dim E As String: E = UCase(Me.Extension)
+    If Not (E = ".EXE" Or E = ".BAT" Or E = ".COM") Then
         MsgBox "Nur ausführbare Programme (exe) können gestartet werden, Dateiendung: " & Me.Extension
         Exit Function
     End If
-    Cmd = IIf(Len(Cmd) = 0, m_PFN, m_PFN & " " & Cmd)
+    cmd = IIf(Len(cmd) = 0, m_PFN, m_PFN & " " & cmd)
     'Cmd = "C:\Windows\Calc.exe"
-    Dim ret As LongPtr: ret = MShell.ShellWait(Cmd, WindowStyle, WorkDir)
+    Dim ret As LongPtr: ret = MShell.ShellWait(cmd, WindowStyle, WorkDir)
     'StartWait = ret
     Exit Function
 Catch:
@@ -675,7 +678,7 @@ Catch:
 End Function
 
 Public Function PathAdd(Optional ByVal NewSubDir As String) As Boolean
-    Me.Path = Me.Path & "\" & NewSubDir
+    Me.Path = Me.Path & NewSubDir & "\"
     PathAdd = PathCreate()
 End Function
 'a path is a stack so we need the words Peek, Push, Pop
@@ -721,12 +724,12 @@ End Function
 Public Function CheckExtensions(ParamArray exts()) As String
     'checks whether the file extension is contained in the array exts()
     'überprüft ob die extension in dem angegebenen Array exts() enthalten ist
-    Dim e As String: e = Me.Extension
+    Dim E As String: E = Me.Extension
     Dim i As Integer
     For i = 0 To UBound(exts)
         'wenn mindestens eine zutrifft dann OK, es wird die Extension zurückgegeben, andernfalls ""
-        If e = exts(i) Then
-            CheckExtensions = e
+        If E = exts(i) Then
+            CheckExtensions = E
             Exit Function
         End If
     Next
@@ -741,12 +744,12 @@ Public Function ChangeExt(newExtension As String) As PathFileName
 '    Set ChangeExt = New PFN: ChangeExt.New_ Me.Path & Me.FileNameOnly & newExtension
 End Function
 Public Function AddToFileNameR(ByVal addstr As String) As PathFileName
-    Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameR = New_PathFileName(Me.Path & Me.FileNameOnly & addstr & IIf(Len(e), "." & e, ""))
+    Dim E As String: E = Me.Extension 'Änderung 08.01.2016
+    Set AddToFileNameR = New_PathFileName(Me.Path & Me.FileNameOnly & addstr & IIf(Len(E), "." & E, ""))
 End Function
 Public Function AddToFileNameL(ByVal addstr As String) As PathFileName
-    Dim e As String: e = Me.Extension 'Änderung 08.01.2016
-    Set AddToFileNameL = New_PathFileName(Me.Path & addstr & Me.FileNameOnly & IIf(Len(e), "." & e, ""))
+    Dim E As String: E = Me.Extension 'Änderung 08.01.2016
+    Set AddToFileNameL = New_PathFileName(Me.Path & addstr & Me.FileNameOnly & IIf(Len(E), "." & E, ""))
 End Function
 
 Public Function Exists() As Boolean
@@ -780,6 +783,13 @@ Public Function PathExists() As Boolean
     On Error GoTo 0
 End Function
 
+Public Property Get Encoding() As ETextEncoding
+    Encoding = m_enc 'Text_UnicodeEncoding
+End Property
+Public Property Let Encoding(ByVal Value As ETextEncoding)
+    m_enc = Value
+End Property
+    
 
 '  Set fso = CreateObject("Scripting.FileSystemObject")
 '   gefunden = False
@@ -893,11 +903,11 @@ Public Function Rename(ByVal ToPFN As String, _
                        Optional ByVal BolRenameMe As Boolean) As Boolean
 TryE: On Error GoTo CatchE
     Dim RenFile As PathFileName: Set RenFile = New_PathFileName(ToPFN)
-    Dim Cmd     As String
+    Dim cmd     As String
     If Not RenFile.Exists Then
         'Wird nicht renamed wenn es die Datei schon gibt
-        Cmd = Chr(34) & Me.Value & Chr(34) & " " & Chr(34) & RenFile.Value & Chr(34)
-        Call ShellWait("cmd /c ren " & Cmd, VbAppWinStyle.vbHide)
+        cmd = Chr(34) & Me.Value & Chr(34) & " " & Chr(34) & RenFile.Value & Chr(34)
+        Call ShellWait("cmd /c ren " & cmd, VbAppWinStyle.vbHide)
         Rename = True
         If BolRenameMe Then
             'soll nur die Datei auf der Festplatte umbenannt werden
@@ -1052,7 +1062,7 @@ Try: On Error GoTo Catch
             Case EFileShare.FileShare_LockReadWrite: Open PFN For Input Lock Read Write As m_FNr
             Case EFileShare.FileShare_Shared:        Open PFN For Input Shared As m_FNr
             End Select
-        Case EFileAccess.FileAccess_Read
+        Case EFileAccess.FileAccess_Read, EFileAccess.FileAccess_ReadWrite
             Select Case fs
             Case EFileShare.FileShare_None:          Open PFN For Input Access Read As m_FNr
             Case EFileShare.FileShare_LockRead:      Open PFN For Input Access Read Lock Read As m_FNr
@@ -1190,11 +1200,20 @@ Try: On Error GoTo Catch
             ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
             Get m_FNr, , Buffer
             ReadAllText = MString.ConvertFromUTF8(Buffer)
-        Case EByteOrderMark.bom_UTF_8
+        'Case EByteOrderMark.bom_UTF_8
         
         Case Else
-            s = Space(LOF(m_FNr) - Me.pos + 1)
-            Get m_FNr, , s
+            'there is not bom, maybe xml file?
+            Select Case m_enc
+            Case ETextEncoding.Text_UTF8Encoding
+                ReDim Buffer(0 To LOF(m_FNr) - Me.pos + 1)
+                Get m_FNr, , Buffer
+                s = MString.Encoding_GetString(m_enc, Buffer)
+            Case Else
+                s = Space(LOF(m_FNr) - Me.pos + 1)
+                Get m_FNr, , s
+            End Select
+            
             ReadAllText = s
         End Select
             
@@ -1260,11 +1279,11 @@ End Function
 Private Function ReadBOM() As EByteOrderMark
     
     If m_FNr = 0 Then Me.OpenFile EFileMode.FileMode_Binary, FileAccess_Read, FileShare_Shared
-    Dim e As EByteOrderMark: Get m_FNr, 1, e 'read 4 bytes from position 0
-    e = MString.EByteOrderMark_Parse(e)
+    Dim E As EByteOrderMark: Get m_FNr, 1, E 'read 4 bytes from position 0
+    E = MString.EByteOrderMark_Parse(E)
     'jetzt seek setzen
     Dim fpos As Long
-    Select Case e
+    Select Case E
     Case EByteOrderMark.bom_UTF_32_BE  ': nix machen
     Case EByteOrderMark.bom_UTF_32_LE  ': nix machen
     Case EByteOrderMark.bom_GB_18030   ': nix machen
@@ -1279,7 +1298,7 @@ Private Function ReadBOM() As EByteOrderMark
     Case Else: fpos = 1
     End Select
     Me.pos = fpos
-    ReadBOM = e
+    ReadBOM = E
 End Function
 
 'private function Bom_Equals(
@@ -1364,6 +1383,11 @@ End Function
 Public Sub WriteByte(ByVal Value As Byte)
     If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
     Put m_FNr, , Value
+End Sub
+
+Public Sub WriteBytes(ByteArray() As Byte)
+    If m_FNr = 0 Then OpenFile EFileMode.FileMode_Binary, FileAccess_ReadWrite
+    Put m_FNr, , ByteArray
 End Sub
 
 Public Function ReadChrW() As Integer
@@ -1587,10 +1611,10 @@ Private Function Get_FileNameOnly(PFN_in As String) As String
     'gibt den Dateinamen ohne Drive, ohne Path und ohne Extension zurück
 'Try: On Error GoTo Catch
     Dim f As String: f = Get_FileName(PFN_in)
-    Dim e As String: e = Get_Extension(PFN_in)
+    Dim E As String: E = Get_Extension(PFN_in)
     If Len(f) Then
-        If Len(e) Then
-            f = Left(f, Len(f) - Len(e))
+        If Len(E) Then
+            f = Left(f, Len(f) - Len(E))
         End If
     End If
     Get_FileNameOnly = f
@@ -1682,20 +1706,20 @@ Private Function GetValidPath(ByVal aPath As String) As String
 End Function
 Private Function IsValidFileName(aFileName As String) As Boolean
     Dim i As Long
-    Dim x As String: x = "\/:*?""<>|"
+    Dim X As String: X = "\/:*?""<>|"
     If Len(aFileName) Then
-        For i = 1 To Len(x)
-            IsValidFileName = (InStr(1, aFileName, Mid$(x, i, 1)) <> 0)
+        For i = 1 To Len(X)
+            IsValidFileName = (InStr(1, aFileName, Mid$(X, i, 1)) <> 0)
             If Not IsValidFileName Then Exit Function
         Next
     End If
 End Function
 Private Function GetValidFileName(aFileName As String) As String
     Dim i As Long
-    Dim c As String, x As String: x = "\/:" & C_InvalidChars '*?""<>|"
+    Dim c As String, X As String: X = "\/:" & C_InvalidChars '*?""<>|"
     If Len(aFileName) Then
         'GetValidFileName = aFileName
-        GetValidFileName = RemoveChars(aFileName, x)
+        GetValidFileName = RemoveChars(aFileName, X)
         'For i = 1 To Len(x)
         '    c = Mid$(x, i, 1)
         '    GetValidFileName = Replace$(GetValidFileName, c, vbNullString)
@@ -1749,22 +1773,22 @@ Try: On Error GoTo Catch
     If p <> 0 Then aStrPath = Left$(aStrPath, p - 1)
     'und alle Zeichen entfernen die nicht hinein dürfen
     Dim i As Long
-    Dim c As String, x As String: x = C_InvalidChars '"*?""<>|"
+    Dim c As String, X As String: X = C_InvalidChars '"*?""<>|"
     Select Case C_DirSepChar
-    Case 92: x = x & "/"
-    Case 47: x = x & "\"
+    Case 92: X = X & "/"
+    Case 47: X = X & "\"
     End Select
-    aStrPath = RemoveChars(aStrPath, x)
+    aStrPath = RemoveChars(aStrPath, X)
     aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
     c = Chr$(C_DirSepChar)
-    x = c & c
+    X = c & c
     Dim posDblBackSlash As Long
-    posDblBackSlash = InStr(1, aStrPath, x)
+    posDblBackSlash = InStr(1, aStrPath, X)
     If posDblBackSlash > 1 Then
-        aStrPath = Replace(aStrPath, x, c)
+        aStrPath = Replace(aStrPath, X, c)
     End If
     'und doppelpunkte ":" entfernen ausser in der Laufwerksangabe
     Dim sd As String: sd = Get_Drive(aStrPath)
